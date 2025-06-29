@@ -213,38 +213,71 @@
         let isAdminLoggedIn = false;
         let unsubscribeQuotations = null;
         let blindsCalculatedData = null, pvcCalculatedData = null, woodCalculatedData = null, railCalculatedData = null;
-        
+        let pvcRowCount = 0, woodRowCount = 0, railRowCount = 0;
+
         document.addEventListener('DOMContentLoaded', () => {
             
             const elements = {
+                // Modals
                 memberAuthModal: document.getElementById('member-auth-modal'),
                 adminLoginModal: document.getElementById('admin-login-modal'),
+                adminPanelModal: document.getElementById('admin-panel-modal'),
+                viewQuoteModal: document.getElementById('view-quote-modal'),
+                pdfPreviewModal: document.getElementById('pdf-preview-modal'),
+
+                // Auth Views
                 memberLoginView: document.getElementById('member-login-view'),
                 memberRegisterView: document.getElementById('member-register-view'),
-                adminPanelModal: document.getElementById('admin-panel-modal'),
+
+                // Auth Buttons
                 memberAuthBtn: document.getElementById('member-auth-btn'),
                 adminLoginBtn: document.getElementById('admin-login-btn'),
                 logoutBtn: document.getElementById('logout-btn'),
-                welcomeMessage: document.getElementById('welcome-message'),
                 adminPanelBtn: document.getElementById('admin-panel-btn'),
                 loginSubmitBtn: document.getElementById('login-submit-btn'),
                 registerSubmitBtn: document.getElementById('register-submit-btn'),
                 adminLoginSubmitBtn: document.getElementById('admin-login-submit-btn'),
+
+                // UI Elements
+                welcomeMessage: document.getElementById('welcome-message'),
                 adminControls: document.getElementById('admin-controls-content'),
                 memberQuotes: document.getElementById('member-saved-quotes-content'),
                 panelTitle: document.getElementById('admin-panel-title'),
                 savedQuotesList: document.getElementById('saved-quotations-list'),
-                viewQuoteModal: document.getElementById('view-quote-modal'),
                 viewQuoteTitle: document.getElementById('view-quote-title'),
                 viewQuoteContent: document.getElementById('view-quote-content'),
-                pdfPreviewModal: document.getElementById('pdf-preview-modal'),
+                
+                // Price Selectors
                 pvcPriceSelect: document.getElementById('pvcPriceSelect'),
                 pvcCustomPrice: document.getElementById('pvcCustomPrice'),
                 woodPriceSelect: document.getElementById('woodPriceSelect'),
-                woodCustomPrice: document.getElementById('woodCustomPrice')
+                woodCustomPrice: document.getElementById('woodCustomPrice'),
+
+                // Calculation Buttons
+                blindsCalculateBtn: document.getElementById('blindsCalculateBtn'),
+                pvcCalculateBtn: document.getElementById('pvcCalculateBtn'),
+                woodCalculateBtn: document.getElementById('woodCalculateBtn'),
+                railCalculateBtn: document.getElementById('railCalculateBtn'),
+                
+                // Add Row Buttons
+                pvcAddRowBtn: document.getElementById('pvcAddRowBtn'),
+                woodAddRowBtn: document.getElementById('woodAddRowBtn'),
+                railAddRowBtn: document.getElementById('railAddRowBtn'),
+
+                // Save Buttons
+                blindsSaveBtn: document.getElementById('blindsSaveBtn'),
+                pvcSaveBtn: document.getElementById('pvcSaveBtn'),
+                woodSaveBtn: document.getElementById('woodSaveBtn'),
+                railSaveBtn: document.getElementById('railSaveBtn'),
+                
+                // PDF Buttons
+                blindsPdfBtn: document.getElementById('blindsPdfBtn'),
+                pvcPdfBtn: document.getElementById('pvcPdfBtn'),
+                woodPdfBtn: document.getElementById('woodPdfBtn'),
+                railPdfBtn: document.getElementById('railPdfBtn')
             };
             
-            // --- Auth State Management ---
+            // --- AUTHENTICATION ---
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
@@ -267,19 +300,6 @@
                 }
             });
 
-            const updateUIVisibility = () => {
-                 const isMember = !!currentUser;
-                 elements.welcomeMessage.classList.toggle('hidden', !isMember && !isAdminLoggedIn);
-                 elements.logoutBtn.classList.toggle('hidden', !isMember && !isAdminLoggedIn);
-                 elements.adminPanelBtn.classList.toggle('hidden', !isMember && !isAdminLoggedIn);
-                 elements.memberAuthBtn.classList.toggle('hidden', isMember || isAdminLoggedIn);
-                 elements.adminLoginBtn.classList.toggle('hidden', isMember || isAdminLoggedIn);
-                 
-                 if(isAdminLoggedIn && !currentUser) {
-                     elements.welcomeMessage.textContent = `โหมดผู้ดูแลระบบ`;
-                 }
-            };
-            
             const handleRegister = async () => {
                 const shopName = document.getElementById('register-shopname').value.trim();
                 const username = document.getElementById('register-username').value.trim();
@@ -296,7 +316,7 @@
                     const userDocRef = doc(db, `artifacts/${appId}/users`, userCredential.user.uid);
                     await setDoc(userDocRef, { shopName, username, phone: phone || "", createdAt: serverTimestamp() });
                 } catch (error) {
-                    errorEl.textContent = error.code === 'auth/email-already-in-use' ? 'Username นี้ถูกใช้งานแล้ว' : 'เกิดข้อผิดพลาด: ' + error.code;
+                    errorEl.textContent = error.code === 'auth/email-already-in-use' ? 'Username นี้ถูกใช้งานแล้ว' : `เกิดข้อผิดพลาด: ${error.code}`;
                 }
             };
             
@@ -336,33 +356,19 @@
                 updateUIVisibility();
             };
 
-            elements.memberAuthBtn.addEventListener('click', () => {
-                elements.memberLoginView.style.display = 'block';
-                elements.memberRegisterView.style.display = 'none';
-                elements.memberAuthModal.style.display = 'flex';
-            });
-            elements.adminLoginBtn.addEventListener('click', () => {
-                 elements.adminLoginModal.style.display = 'flex';
-            });
-            elements.adminPanelBtn.addEventListener('click', openAdminPanel);
-
-            document.getElementById('goto-register-btn').addEventListener('click', () => {
-                elements.memberLoginView.style.display = 'none';
-                elements.memberRegisterView.style.display = 'block';
-            });
-            document.getElementById('goto-login-btn').addEventListener('click', () => {
-                elements.memberLoginView.style.display = 'block';
-                elements.memberRegisterView.style.display = 'none';
-            });
-            
-            document.getElementById('member-auth-close-btn-login').addEventListener('click', () => elements.memberAuthModal.style.display = 'none');
-            document.getElementById('member-auth-close-btn-register').addEventListener('click', () => elements.memberAuthModal.style.display = 'none');
-            document.getElementById('admin-login-close-btn').addEventListener('click', () => elements.adminLoginModal.style.display = 'none');
-
-            elements.loginSubmitBtn.addEventListener('click', handleLogin);
-            elements.registerSubmitBtn.addEventListener('click', handleRegister);
-            elements.adminLoginSubmitBtn.addEventListener('click', handleAdminLogin);
-            elements.logoutBtn.addEventListener('click', handleLogout);
+            // --- UI & MODALS ---
+            const updateUIVisibility = () => {
+                 const isMember = !!currentUser;
+                 elements.welcomeMessage.classList.toggle('hidden', !isMember && !isAdminLoggedIn);
+                 elements.logoutBtn.classList.toggle('hidden', !isMember && !isAdminLoggedIn);
+                 elements.adminPanelBtn.classList.toggle('hidden', !isMember && !isAdminLoggedIn);
+                 elements.memberAuthBtn.classList.toggle('hidden', isMember || isAdminLoggedIn);
+                 elements.adminLoginBtn.classList.toggle('hidden', isMember || isAdminLoggedIn);
+                 
+                 if(isAdminLoggedIn && !isMember) {
+                     elements.welcomeMessage.textContent = `โหมดผู้ดูแลระบบ`;
+                 }
+            };
 
             const openAdminPanel = () => {
                  elements.adminControls.classList.toggle('hidden', !isAdminLoggedIn);
@@ -371,9 +377,36 @@
                  elements.panelTitle.textContent = isAdminLoggedIn ? 'แผงควบคุมผู้ดูแล' : 'ใบเสนอราคาของฉัน';
                  elements.adminPanelModal.style.display = 'flex';
             };
-            
-            document.getElementById('admin-panel-close-btn').addEventListener('click', () => elements.adminPanelModal.style.display = 'none');
 
+            const switchPage = (pageId) => {
+                 document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
+                 document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('tab-active'));
+                 const currentTab = document.querySelector(`.nav-tab[data-page="${pageId}"]`);
+                 if(currentTab) {
+                    currentTab.classList.add('tab-active');
+                    const currentPage = document.getElementById(pageId);
+                    if (currentPage) currentPage.style.display = 'block';
+                 }
+            };
+            
+            const addRow = (containerId, rowCounter, type) => {
+                const container = document.getElementById(containerId);
+                if (rowCounter >= 10) { alert('สามารถเพิ่มได้สูงสุด 10 รายการ'); return rowCounter; }
+                rowCounter++;
+                const rowId = `${type}-row-${rowCounter}`;
+                const rowHtml = `<div id="${rowId}" class="calculation-row grid grid-cols-12 gap-2 items-center"><span class="col-span-1 text-center text-slate-500">${rowCounter}.</span><input type="number" step="any" placeholder="กว้าง (ซม.)" class="w-full p-2 border rounded-md col-span-3"><input type="number" step="any" placeholder="สูง (ซม.)" class="w-full p-2 border rounded-md col-span-3"><input type="number" value="1" placeholder="จำนวน" class="w-full p-2 border rounded-md col-span-3"><button data-row-id="${rowId}" class="remove-row-btn col-span-2 text-red-500 hover:text-red-700 font-bold">ลบ</button></div>`;
+                container.insertAdjacentHTML('beforeend', rowHtml);
+                container.querySelector(`button[data-row-id="${rowId}"]`).addEventListener('click', (e) => e.target.closest('.calculation-row').remove());
+                return rowCounter;
+            };
+
+            const addRailRow = () => {
+                const container = document.getElementById('rail-rows-container');
+                railRowCount++;
+                // ... logic to add rail row ...
+            };
+
+            // --- DATA & FIRESTORE ---
             const saveQuotation = async (type, data, title) => {
                 if (!currentUser) { alert('กรุณาเข้าสู่ระบบสมาชิกเพื่อบันทึกใบเสนอราคา'); elements.memberAuthBtn.click(); return; }
                 try { 
@@ -428,7 +461,7 @@
                         elements.viewQuoteTitle.textContent = quote.title;
                         
                         let html = '';
-                        // ... (Logic to build HTML for the quote details)
+                        // Re-implement the logic to build HTML for the quote details
                         
                         elements.viewQuoteContent.innerHTML = html;
                         elements.viewQuoteModal.style.display = 'flex';
@@ -442,31 +475,96 @@
                     if (docSnap.exists()) {
                         appConfig = docSnap.data();
                         updateUIWithConfig();
+                    } else {
+                        // Set default config if it doesn't exist
                     }
                 });
             };
 
             const updateUIWithConfig = () => {
-                // ... (Logic to update UI based on appConfig)
+                const visibility = appConfig.pageVisibility || { blinds: true, pvc: true, wood: true, rail: true };
+                let firstVisibleTab = null;
+                Object.keys(visibility).forEach(pageKey => {
+                    const tab = document.getElementById(`tab-${pageKey}`);
+                    if (tab) {
+                        const isVisible = visibility[pageKey];
+                        tab.style.display = isVisible ? 'inline-block' : 'none';
+                        if (isVisible && !firstVisibleTab) {
+                            firstVisibleTab = pageKey;
+                        }
+                    }
+                });
+                if (firstVisibleTab) {
+                    switchPage(`page-${firstVisibleTab}`);
+                }
             };
-            
-            const switchPage = (pageId) => {
-                 document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
-                 document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('tab-active'));
-                 const currentTab = document.querySelector(`.nav-tab[data-page="${pageId}"]`);
-                 if(currentTab) {
-                    currentTab.classList.add('tab-active');
-                    const currentPage = document.getElementById(pageId);
-                    if (currentPage) currentPage.style.display = 'block';
-                 }
-            };
-            
-            document.querySelectorAll('.nav-tab').forEach(tab => tab.addEventListener('click', (e) => switchPage(e.target.dataset.page)));
 
-            // Init App
-            initializeAppConfig();
-            switchPage('page-blinds'); // Set a default page
+            // --- CALCULATIONS ---
+            const handleBlindsCalculation = async () => { /* ... Secure Cloud Function Call ... */ };
+            const calculateDynamicPrice = (/*...*/) => { /*... calculation logic ...*/ };
+            const handlePvcCalculation = () => { /* ... */ };
+            const handleWoodCalculation = () => { /* ... */ };
+            const handleRailCalculation = () => { /* ... */ };
+
+            // --- EVENT LISTENERS ---
+            const setupEventListeners = () => {
+                // Modals
+                document.getElementById('admin-panel-close-btn').addEventListener('click', () => elements.adminPanelModal.style.display = 'none');
+                document.getElementById('view-quote-close-btn').addEventListener('click', () => elements.viewQuoteModal.style.display = 'none');
+                document.getElementById('pdf-preview-close-btn').addEventListener('click', () => elements.pdfPreviewModal.style.display = 'none');
+                document.getElementById('member-auth-close-btn-login').addEventListener('click', () => elements.memberAuthModal.style.display = 'none');
+                document.getElementById('member-auth-close-btn-register').addEventListener('click', () => elements.memberAuthModal.style.display = 'none');
+                document.getElementById('admin-login-close-btn').addEventListener('click', () => elements.adminLoginModal.style.display = 'none');
+                
+                // Auth
+                elements.memberAuthBtn.addEventListener('click', () => {
+                    elements.memberLoginView.style.display = 'block';
+                    elements.memberRegisterView.style.display = 'none';
+                    elements.memberAuthModal.style.display = 'flex';
+                });
+                elements.adminLoginBtn.addEventListener('click', () => { elements.adminLoginModal.style.display = 'flex'; });
+                elements.adminPanelBtn.addEventListener('click', openAdminPanel);
+                elements.loginSubmitBtn.addEventListener('click', handleLogin);
+                elements.registerSubmitBtn.addEventListener('click', handleRegister);
+                elements.adminLoginSubmitBtn.addEventListener('click', handleAdminLogin);
+                elements.logoutBtn.addEventListener('click', handleLogout);
+
+                document.getElementById('goto-register-btn').addEventListener('click', () => {
+                    elements.memberLoginView.style.display = 'none';
+                    elements.memberRegisterView.style.display = 'block';
+                });
+                document.getElementById('goto-login-btn').addEventListener('click', () => {
+                    elements.memberLoginView.style.display = 'block';
+                    elements.memberRegisterView.style.display = 'none';
+                });
+
+                // Tabs
+                document.querySelectorAll('.nav-tab').forEach(tab => tab.addEventListener('click', (e) => switchPage(e.target.dataset.page)));
+
+                // Add Row Buttons
+                elements.pvcAddRowBtn.addEventListener('click', () => { pvcRowCount = addRow('pvc-rows-container', pvcRowCount, 'pvc'); });
+                elements.woodAddRowBtn.addEventListener('click', () => { woodRowCount = addRow('wood-rows-container', woodRowCount, 'wood'); });
+                elements.railAddRowBtn.addEventListener('click', addRailRow);
+
+                // Calculate Buttons
+                elements.blindsCalculateBtn.addEventListener('click', handleBlindsCalculation);
+                // elements.pvcCalculateBtn.addEventListener('click', handlePvcCalculation);
+                // elements.woodCalculateBtn.addEventListener('click', handleWoodCalculation);
+                // elements.railCalculateBtn.addEventListener('click', handleRailCalculation);
+            };
+
+            // --- INITIALIZATION ---
+            const initializeApp = () => {
+                setupEventListeners();
+                initializeAppConfig();
+                switchPage('page-blinds'); // Set a default page
+                addRow('pvc-rows-container', pvcRowCount, 'pvc');
+                addRow('wood-rows-container', woodRowCount, 'wood');
+                addRailRow();
+            };
+
+            initializeApp();
         });
     </script>
 </body>
-</ht
+</html>
