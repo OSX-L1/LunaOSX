@@ -166,7 +166,7 @@
         <div class="modal-box w-full max-w-sm"><h2 class="text-2xl font-bold text-center mb-6">ผู้ดูแลระบบ</h2><div class="space-y-4"><div><label for="username">Username</label><input id="username" type="text" class="w-full p-3 border rounded-md"></div><div><label for="password">Password</label><input id="password" type="password" class="w-full p-3 border rounded-md"></div><p id="login-error" class="text-red-500 text-sm text-center"></p><button id="login-submit-btn" class="w-full bg-blue-600 text-white py-3 rounded-md font-bold">เข้าสู่ระบบ</button><button id="login-close-btn" class="w-full text-slate-500 py-2">ปิด</button></div></div>
     </div>
     <div id="admin-panel-modal" class="modal-overlay items-start justify-center py-10 overflow-y-auto">
-        <div class="modal-box w-full max-w-2xl"><div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold">แผงควบคุมผู้ดูแล</h2><button id="admin-panel-close-btn" class="text-2xl">&times;</button></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">การแสดงผลหน้าเว็บ</h3><div id="visibility-controls" class="space-y-2"></div></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการราคาฉากกั้นแอร์</h3><div id="pvc-price-controls" class="space-y-2"></div></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการราคามู่ลี่ไม้</h3><div id="wood-price-controls" class="space-y-2"></div></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการราคารางม่าน</h3><div id="rail-price-controls" class="space-y-2"></div></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการราคาม่านม้วน</h3><div id="roller-price-controls" class="space-y-4"></div></div><button id="admin-save-btn" class="w-full bg-green-600 text-white py-3 rounded-md font-bold mb-8">บันทึกการเปลี่ยนแปลง</button><div><h3 class="text-lg font-bold border-b pb-2 mb-3">ใบเสนอราคาที่บันทึกไว้</h3><div id="saved-quotations-list" class="space-y-2 max-h-64 overflow-y-auto"></div></div></div>
+        <div class="modal-box w-full max-w-4xl"><div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold">แผงควบคุมผู้ดูแล</h2><button id="admin-panel-close-btn" class="text-2xl">&times;</button></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">การแสดงผลหน้าเว็บ</h3><div id="visibility-controls" class="space-y-2"></div></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการราคาฉากกั้นแอร์</h3><div id="pvc-price-controls" class="space-y-2"></div><button id="add-pvc-price-btn" class="mt-2 text-sm bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">+ เพิ่มราคา</button></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการราคามู่ลี่ไม้</h3><div id="wood-price-controls" class="space-y-2"></div><button id="add-wood-price-btn" class="mt-2 text-sm bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">+ เพิ่มราคา</button></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการราคารางม่าน</h3><div id="rail-price-controls" class="space-y-2"></div></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการราคาม่านม้วน</h3><div id="roller-price-controls" class="space-y-4"></div></div><button id="admin-save-btn" class="w-full bg-green-600 text-white py-3 rounded-md font-bold mb-8">บันทึกการเปลี่ยนแปลง</button><div><h3 class="text-lg font-bold border-b pb-2 mb-3">ใบเสนอราคาที่บันทึกไว้</h3><div id="saved-quotations-list" class="space-y-2 max-h-64 overflow-y-auto"></div></div></div>
     </div>
     <div id="view-quote-modal" class="modal-overlay items-start justify-center py-10 overflow-y-auto">
         <div class="modal-box w-full max-w-xl"><div class="flex justify-between items-center mb-4"><h2 id="view-quote-title" class="text-xl font-bold">รายละเอียดใบเสนอราคา</h2><button id="view-quote-close-btn" class="text-2xl">&times;</button></div><div id="view-quote-content" class="text-sm"></div></div>
@@ -195,7 +195,6 @@
         import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, deleteDoc, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // --- START: CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyD2j3fg01Cl-mcl3z7iB-dIglS5zhyAu-g",
             authDomain: "sunnyos.firebaseapp.com",
@@ -207,7 +206,6 @@
         };
         
         const appId = 'product-price-calculator-app'; 
-        // --- END: CONFIGURATION ---
         
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -800,26 +798,33 @@
                     const selectedType = typeSelect.value;
                     if (!selectedCategory || !selectedType || !rollerData[selectedCategory] || !rollerData[selectedCategory][selectedType]) {
                         priceDisplay.textContent = '-';
-                        codeSelect.innerHTML = '';
+                        codeSelect.innerHTML = '<option>N/A</option>';
                         return;
                     }
                     
                     const info = rollerData[selectedCategory][selectedType];
-                    priceDisplay.textContent = `฿${info.price.toLocaleString('en-US')}`;
+                    priceDisplay.textContent = info.price ? `฿${info.price.toLocaleString('en-US')}`: '-';
                     
                     codeSelect.innerHTML = '';
-                    info.codes.forEach(code => {
-                        const option = document.createElement('option');
-                        option.value = code;
-                        option.textContent = code;
-                        codeSelect.appendChild(option);
-                    });
+                    if(info.codes && info.codes.length > 0){
+                        info.codes.forEach(code => {
+                            const option = document.createElement('option');
+                            option.value = code;
+                            option.textContent = code;
+                            codeSelect.appendChild(option);
+                        });
+                    } else {
+                         codeSelect.innerHTML = '<option>N/A</option>';
+                    }
                 };
 
                 const updateTypeDropdown = () => {
                     const selectedCategory = categorySelect.value;
                     typeSelect.innerHTML = '';
-                    if (!rollerData[selectedCategory]) return;
+                    if (!rollerData[selectedCategory]) {
+                        updatePriceAndCodes();
+                        return;
+                    };
                     
                     Object.keys(rollerData[selectedCategory]).forEach(type => {
                         const option = document.createElement('option');
@@ -919,8 +924,10 @@
                 onSnapshot(configRef, (docSnap) => {
                     if (docSnap.exists()) {
                         appConfig = docSnap.data();
+                         if (!appConfig.prices) { appConfig.prices = {}; }
                          if (!appConfig.prices.rail) { appConfig.prices.rail = defaultConfig.prices.rail; }
                          if (!appConfig.prices.roller) { appConfig.prices.roller = defaultConfig.prices.roller; }
+                         if (!appConfig.pageVisibility) { appConfig.pageVisibility = defaultConfig.pageVisibility; }
                          if (appConfig.pageVisibility.roller === undefined) { appConfig.pageVisibility.roller = defaultConfig.pageVisibility.roller; }
                         updateUIWithConfig();
                     } else {
@@ -962,40 +969,77 @@
             const saveAdminChanges = async () => {
                 const newConfig = JSON.parse(JSON.stringify(appConfig));
                 document.querySelectorAll('#visibility-controls input').forEach(input => { newConfig.pageVisibility[input.dataset.page] = input.checked; });
-                document.querySelectorAll('#pvc-price-controls .price-item').forEach((item, i) => { newConfig.prices.pvc[i].text = item.querySelector('.price-text').value; newConfig.prices.pvc[i].value = parseFloat(item.querySelector('.price-value').value); });
-                document.querySelectorAll('#wood-price-controls .price-item').forEach((item, i) => { newConfig.prices.wood[i].text = item.querySelector('.price-text').value; newConfig.prices.wood[i].value = parseFloat(item.querySelector('.price-value').value); });
+                
+                const newPvcPrices = [];
+                document.querySelectorAll('#pvc-price-controls .price-item').forEach(item => {
+                    const text = item.querySelector('.price-text').value.trim();
+                    const value = parseFloat(item.querySelector('.price-value').value);
+                    if (text && !isNaN(value)) { newPvcPrices.push({ text, value }); }
+                });
+                newConfig.prices.pvc = newPvcPrices;
+
+                const newWoodPrices = [];
+                document.querySelectorAll('#wood-price-controls .price-item').forEach(item => {
+                    const text = item.querySelector('.price-text').value.trim();
+                    const value = parseFloat(item.querySelector('.price-value').value);
+                    if (text && !isNaN(value)) { newWoodPrices.push({ text, value }); }
+                });
+                newConfig.prices.wood = newWoodPrices;
+
                 document.querySelectorAll('#rail-price-controls .price-item').forEach(item => {
                     const key = item.dataset.key;
                     if (key) { newConfig.prices.rail[key] = parseFloat(item.querySelector('.price-value').value); }
                 });
-                // Save Roller Blinds prices
-                document.querySelectorAll('#roller-price-controls .roller-type-item').forEach(item => {
-                    const category = item.dataset.category;
-                    const type = item.dataset.type;
-                    if (category && type && newConfig.prices.roller[category] && newConfig.prices.roller[category][type]) {
-                        const price = parseFloat(item.querySelector('.roller-type-price').value);
-                        const codes = item.querySelector('.roller-type-codes').value.split('\n').map(c => c.trim()).filter(c => c);
-                        newConfig.prices.roller[category][type].price = price;
-                        newConfig.prices.roller[category][type].codes = codes;
+
+                const newRollerPrices = {};
+                document.querySelectorAll('#roller-price-controls .roller-category-item').forEach(catItem => {
+                    const categoryName = catItem.querySelector('.roller-category-name').value.trim();
+                    if (categoryName) {
+                        newRollerPrices[categoryName] = {};
+                        catItem.querySelectorAll('.roller-type-item').forEach(typeItem => {
+                            const typeName = typeItem.querySelector('.roller-type-name').value.trim();
+                            const price = parseFloat(typeItem.querySelector('.roller-type-price').value);
+                            const codes = typeItem.querySelector('.roller-type-codes').value.split('\n').map(c => c.trim()).filter(c => c);
+                            if (typeName && !isNaN(price)) {
+                                newRollerPrices[categoryName][typeName] = { price, codes };
+                            }
+                        });
                     }
                 });
+                newConfig.prices.roller = newRollerPrices;
 
                 await setDoc(doc(db, `artifacts/${appId}/public/data/config/main`), newConfig);
                 alert('บันทึกการเปลี่ยนแปลงแล้ว'); adminPanelModal.style.display = 'none';
+            };
+            
+            // --- START: Admin Panel Dynamic Functions ---
+            const createPriceItemHTML = (text = '', value = '') => {
+                const item = document.createElement('div');
+                item.className = 'price-item grid grid-cols-12 gap-2 items-center';
+                item.innerHTML = `
+                    <input type="text" class="price-text w-full p-1 border rounded col-span-7" value="${text}" placeholder="ชื่อรายการ">
+                    <input type="number" step="any" class="price-value w-full p-1 border rounded col-span-3" value="${value}" placeholder="ราคา">
+                    <button class="delete-price-btn text-red-500 hover:text-red-700 col-span-2 font-bold">ลบ</button>
+                `;
+                item.querySelector('.delete-price-btn').addEventListener('click', () => item.remove());
+                return item;
             };
 
             const openAdminPanel = () => {
                 if(!isLoggedIn) return;
                 const visibility = appConfig.pageVisibility || {};
                 const prices = appConfig.prices || { pvc: [], wood: [], rail: {}, roller: {} };
+                
                 const visContainer = document.getElementById('visibility-controls');
                 visContainer.innerHTML = Object.keys(tabElements).map(key => `<label class="flex items-center"><input type="checkbox" data-page="${key}" ${visibility[key] !== false ? 'checked' : ''} class="mr-2 h-4 w-4">${tabElements[key].textContent}</label>`).join('');
                 
                 const pvcContainer = document.getElementById('pvc-price-controls');
-                pvcContainer.innerHTML = (prices.pvc || []).map(p => `<div class="price-item grid grid-cols-2 gap-2"><input type="text" class="price-text w-full p-1 border rounded" value="${p.text}"><input type="number" class="price-value w-full p-1 border rounded" value="${p.value}"></div>`).join('');
+                pvcContainer.innerHTML = '';
+                (prices.pvc || []).forEach(p => pvcContainer.appendChild(createPriceItemHTML(p.text, p.value)));
                 
                 const woodContainer = document.getElementById('wood-price-controls');
-                woodContainer.innerHTML = (prices.wood || []).map(p => `<div class="price-item grid grid-cols-2 gap-2"><input type="text" class="price-text w-full p-1 border rounded" value="${p.text}"><input type="number" class="price-value w-full p-1 border rounded" value="${p.value}"></div>`).join('');
+                woodContainer.innerHTML = '';
+                (prices.wood || []).forEach(p => woodContainer.appendChild(createPriceItemHTML(p.text, p.value)));
                 
                 const railContainer = document.getElementById('rail-price-controls');
                 const railPrices = prices.rail || {};
@@ -1007,35 +1051,76 @@
                     <div class="price-item grid grid-cols-2 gap-2 items-center" data-key="roman"><label>รางม่านพับ</label><input type="number" class="price-value w-full p-1 border rounded" value="${railPrices.roman || 0}"></div>
                 `;
 
-                // Populate Roller Blinds Admin Controls
                 const rollerContainer = document.getElementById('roller-price-controls');
+                rollerContainer.innerHTML = '';
                 const rollerPrices = prices.roller || {};
-                let rollerHtml = '';
                 for (const category in rollerPrices) {
-                    rollerHtml += `<div class="p-3 border rounded-lg bg-slate-50 space-y-2">`;
-                    rollerHtml += `<h4 class="font-bold text-slate-700">${category}</h4>`;
-                    for (const type in rollerPrices[category]) {
-                        const data = rollerPrices[category][type];
-                        rollerHtml += `<div class="roller-type-item p-2 border rounded bg-white" data-category="${category}" data-type="${type}">
-                                         <p class="font-medium text-slate-800">${type}</p>
-                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1">
-                                           <div>
-                                             <label class="text-xs">ราคา</label>
-                                             <input type="number" class="roller-type-price w-full p-1 border rounded" value="${data.price}">
-                                           </div>
-                                           <div>
-                                             <label class="text-xs">รหัส (1 ต่อบรรทัด)</label>
-                                              <textarea class="roller-type-codes w-full p-1 border rounded text-sm h-24">${data.codes.join('\n')}</textarea>
-                                           </div>
-                                         </div>
-                                       </div>`;
-                    }
-                    rollerHtml += `</div>`;
+                    rollerContainer.appendChild(createRollerCategoryHTML(category, rollerPrices[category]));
                 }
-                rollerContainer.innerHTML = rollerHtml;
+                const addCategoryBtn = document.createElement('button');
+                addCategoryBtn.className = 'mt-4 text-sm bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600';
+                addCategoryBtn.textContent = '+ เพิ่มประเภทหลัก (Category)';
+                addCategoryBtn.onclick = () => {
+                    const newCat = createRollerCategoryHTML('', {});
+                    rollerContainer.insertBefore(newCat, addCategoryBtn);
+                };
+                rollerContainer.appendChild(addCategoryBtn);
 
                 adminPanelModal.style.display = 'flex';
             };
+
+            const createRollerTypeHTML = (typeName = '', typeData = { price: 0, codes: [] }) => {
+                const typeItem = document.createElement('div');
+                typeItem.className = 'roller-type-item p-2 border rounded bg-white mt-2';
+                typeItem.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <input type="text" class="roller-type-name font-medium text-slate-800 border-b-2 w-full" value="${typeName}" placeholder="ชื่อรุ่นสินค้า">
+                        <button class="delete-type-btn text-red-500 ml-2 font-bold">ลบ</button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-1">
+                        <div>
+                            <label class="text-xs">ราคา</label>
+                            <input type="number" step="any" class="roller-type-price w-full p-1 border rounded" value="${typeData.price || 0}">
+                        </div>
+                        <div>
+                            <label class="text-xs">รหัส (1 ต่อบรรทัด)</label>
+                            <textarea class="roller-type-codes w-full p-1 border rounded text-sm h-24" placeholder="รหัสสินค้า">${(typeData.codes || []).join('\n')}</textarea>
+                        </div>
+                    </div>
+                `;
+                typeItem.querySelector('.delete-type-btn').addEventListener('click', () => typeItem.remove());
+                return typeItem;
+            };
+
+            const createRollerCategoryHTML = (categoryName = '', categoryData = {}) => {
+                const catItem = document.createElement('div');
+                catItem.className = 'roller-category-item p-3 border rounded-lg bg-slate-50 space-y-2';
+                
+                const header = document.createElement('div');
+                header.className = 'flex justify-between items-center';
+                header.innerHTML = `
+                    <input type="text" class="roller-category-name font-bold text-slate-700 text-lg border-b-2 w-full" value="${categoryName}" placeholder="ชื่อประเภทหลัก">
+                    <button class="delete-category-btn text-red-500 ml-4 font-bold">ลบประเภท</button>
+                `;
+                header.querySelector('.delete-category-btn').addEventListener('click', () => catItem.remove());
+                catItem.appendChild(header);
+
+                const typesContainer = document.createElement('div');
+                typesContainer.className = 'roller-types-container pl-4';
+                for (const typeName in categoryData) {
+                    typesContainer.appendChild(createRollerTypeHTML(typeName, categoryData[typeName]));
+                }
+                catItem.appendChild(typesContainer);
+
+                const addTypeBtn = document.createElement('button');
+                addTypeBtn.className = 'mt-2 text-xs bg-blue-500 text-white py-1 px-2 rounded hover:bg-blue-600';
+                addTypeBtn.textContent = '+ เพิ่มรุ่นสินค้า';
+                addTypeBtn.onclick = () => typesContainer.appendChild(createRollerTypeHTML());
+                catItem.appendChild(addTypeBtn);
+
+                return catItem;
+            };
+            // --- END: Admin Panel Dynamic Functions ---
 
             const saveQuotation = async (type, data, title) => {
                 try { 
@@ -1052,7 +1137,9 @@
             
             const deleteQuotation = async (event) => {
                 const id = event.target.dataset.id;
-                if (window.confirm(`คุณต้องการลบใบเสนอราคานี้ใช่หรือไม่?`)) {
+                // Custom modal confirmation would be better, but window.confirm is used for simplicity here.
+                const userConfirmed = window.confirm(`คุณต้องการลบใบเสนอราคานี้ใช่หรือไม่?`);
+                if (userConfirmed) {
                     try { 
                         await deleteDoc(doc(db, `artifacts/${appId}/public/data/quotations`, id)); 
                     } 
@@ -1182,7 +1269,9 @@
                 } else { document.getElementById('login-error').textContent = 'Username หรือ Password ไม่ถูกต้อง'; }
             });
             document.getElementById('admin-save-btn').addEventListener('click', saveAdminChanges);
-            
+            document.getElementById('add-pvc-price-btn').addEventListener('click', () => document.getElementById('pvc-price-controls').appendChild(createPriceItemHTML()));
+            document.getElementById('add-wood-price-btn').addEventListener('click', () => document.getElementById('wood-price-controls').appendChild(createPriceItemHTML()));
+
             document.getElementById('blindsCalculateBtn').addEventListener('click', handleBlindsCalculation);
             document.getElementById('blindsPdfBtn').addEventListener('click', () => {
                 const data = blindsCalculatedData; if(!data) return;
