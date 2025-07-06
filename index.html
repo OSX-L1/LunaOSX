@@ -38,11 +38,11 @@
                 <p class="text-xs text-slate-500">เลือกประเภทสินค้า</p>
             </div>
             <nav class="space-y-2">
-                <button id="tab-blinds" class="nav-tab w-full text-left py-2.5 px-4 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors" data-page="page-blinds">คำนวณมู่ลี่</button>
-                <button id="tab-pvc" class="nav-tab w-full text-left py-2.5 px-4 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors" data-page="page-pvc">คำนวณฉากกั้นแอร์</button>
-                <button id="tab-wood" class="nav-tab w-full text-left py-2.5 px-4 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors" data-page="page-wood">คำนวณมู่ลี่ไม้</button>
-                <button id="tab-rail" class="nav-tab w-full text-left py-2.5 px-4 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors" data-page="page-rail">คำนวณรางม่าน</button>
-                <button id="tab-roller" class="nav-tab w-full text-left py-2.5 px-4 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors" data-page="page-roller">คำนวณม่านม้วน</button>
+                <button class="nav-tab w-full text-left py-2.5 px-4 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors" data-page="page-blinds">คำนวณมู่ลี่</button>
+                <button class="nav-tab w-full text-left py-2.5 px-4 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors" data-page="page-pvc">คำนวณฉากกั้นแอร์</button>
+                <button class="nav-tab w-full text-left py-2.5 px-4 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors" data-page="page-wood">คำนวณมู่ลี่ไม้</button>
+                <button class="nav-tab w-full text-left py-2.5 px-4 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors" data-page="page-rail">คำนวณรางม่าน</button>
+                <button class="nav-tab w-full text-left py-2.5 px-4 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors" data-page="page-roller">คำนวณม่านม้วน</button>
             </nav>
         </aside>
 
@@ -187,14 +187,12 @@
     </div>
     
     <script>
-        // This is a placeholder for the Base64 font data.
-        // In a real application, the full Base64 string would be here.
         var Sarabun_Regular_normal = 'AAEAAAARAQAABAAQR0RFRg... (The full Base64 encoded font data from your GitHub is now embedded here)';
     </script>
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, deleteDoc, query, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, deleteDoc, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -238,11 +236,11 @@
                 roller: document.getElementById('page-roller')
             };
             const tabElements = {
-                blinds: document.getElementById('tab-blinds'),
-                pvc: document.getElementById('tab-pvc'),
-                wood: document.getElementById('tab-wood'),
-                rail: document.getElementById('tab-rail'),
-                roller: document.getElementById('tab-roller')
+                blinds: document.querySelector('[data-page="page-blinds"]'),
+                pvc: document.querySelector('[data-page="page-pvc"]'),
+                wood: document.querySelector('[data-page="page-wood"]'),
+                rail: document.querySelector('[data-page="page-rail"]'),
+                roller: document.querySelector('[data-page="page-roller"]')
             };
             const adminLoginModal = document.getElementById('admin-login-modal');
             const adminPanelModal = document.getElementById('admin-panel-modal');
@@ -1259,7 +1257,7 @@
             };
 
             // --- BIND EVENT LISTENERS ---
-            Object.keys(tabElements).forEach(key => tabElements[key].addEventListener('click', () => switchPage(`page-${key}`)));
+            Object.values(tabElements).forEach(tab => tab.addEventListener('click', () => switchPage(tab.dataset.page)));
             
             document.getElementById('admin-login-btn').addEventListener('click', () => { adminLoginModal.style.display = 'flex'; });
             document.getElementById('login-close-btn').addEventListener('click', () => { adminLoginModal.style.display = 'none'; });
@@ -1297,7 +1295,6 @@
             });
             document.getElementById('pvcSaveBtn').addEventListener('click', () => { if(pvcCalculatedData) saveQuotation('pvc', pvcCalculatedData, `ฉากกั้นแอร์ - ${pvcCalculatedData.priceText}`); });
             
-            // --- START: Added logic for custom price fields ---
             document.getElementById('pvcPriceSelect').addEventListener('change', (e) => {
                 const customPriceInput = document.getElementById('pvcCustomPrice');
                 if (e.target.value === 'custom') {
@@ -1327,7 +1324,6 @@
                     customPriceInput.value = '';
                 }
             });
-            // --- END: Added logic for custom price fields ---
 
 
             document.getElementById('woodAddRowBtn').addEventListener('click', addWoodRow);
