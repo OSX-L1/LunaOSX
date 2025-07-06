@@ -136,8 +136,8 @@
                         </div>
                         <div class="bg-slate-50 p-4 rounded-lg">
                             <div class="flex justify-between items-center">
-                                 <span class="font-medium text-slate-700">ราคา/หน่วย:</span>
-                                 <span id="rollerPriceDisplay" class="text-xl font-bold text-green-600"></span>
+                                <span class="font-medium text-slate-700">ราคา/หน่วย:</span>
+                                <span id="rollerPriceDisplay" class="text-xl font-bold text-green-600"></span>
                             </div>
                         </div>
 
@@ -187,12 +187,14 @@
     </div>
     
     <script>
+        // This is a placeholder for the Base64 font data.
+        // In a real application, the full Base64 string would be here.
         var Sarabun_Regular_normal = 'AAEAAAARAQAABAAQR0RFRg... (The full Base64 encoded font data from your GitHub is now embedded here)';
     </script>
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, deleteDoc, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, deleteDoc, query, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -276,7 +278,7 @@
                     e.target.closest('.calculation-row').remove();
                     pvcRowCount = container.querySelectorAll('.calculation-row').length;
                      container.querySelectorAll('.calculation-row').forEach((row, index) => {
-                         row.querySelector('.col-span-1').textContent = `${index + 1}.`;
+                          row.querySelector('.col-span-1').textContent = `${index + 1}.`;
                     });
                 });
             };
@@ -1294,6 +1296,39 @@
                 showPdfPreview('ใบเสนอราคา - ฉากกั้นแอร์', columns, rows, data.totalCost, 'ใบเสนอราคา-ฉากกั้นแอร์.pdf', extraInfo);
             });
             document.getElementById('pvcSaveBtn').addEventListener('click', () => { if(pvcCalculatedData) saveQuotation('pvc', pvcCalculatedData, `ฉากกั้นแอร์ - ${pvcCalculatedData.priceText}`); });
+            
+            // --- START: Added logic for custom price fields ---
+            document.getElementById('pvcPriceSelect').addEventListener('change', (e) => {
+                const customPriceInput = document.getElementById('pvcCustomPrice');
+                if (e.target.value === 'custom') {
+                    customPriceInput.disabled = false;
+                    customPriceInput.classList.remove('bg-slate-200');
+                    customPriceInput.classList.add('bg-white');
+                    customPriceInput.focus();
+                } else {
+                    customPriceInput.disabled = true;
+                    customPriceInput.classList.add('bg-slate-200');
+                    customPriceInput.classList.remove('bg-white');
+                    customPriceInput.value = '';
+                }
+            });
+
+            document.getElementById('woodPriceSelect').addEventListener('change', (e) => {
+                const customPriceInput = document.getElementById('woodCustomPrice');
+                if (e.target.value === 'custom') {
+                    customPriceInput.disabled = false;
+                    customPriceInput.classList.remove('bg-slate-200');
+                    customPriceInput.classList.add('bg-white');
+                    customPriceInput.focus();
+                } else {
+                    customPriceInput.disabled = true;
+                    customPriceInput.classList.add('bg-slate-200');
+                    customPriceInput.classList.remove('bg-white');
+                    customPriceInput.value = '';
+                }
+            });
+            // --- END: Added logic for custom price fields ---
+
 
             document.getElementById('woodAddRowBtn').addEventListener('click', addWoodRow);
             document.getElementById('woodCalculateBtn').addEventListener('click', handleWoodCalculation);
