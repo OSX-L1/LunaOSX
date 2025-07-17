@@ -75,6 +75,7 @@
                 <button class="nav-tab w-full text-left py-2.5 px-4 rounded-lg text-slate-700" data-page="page-wood">คำนวณมู่ลี่ไม้</button>
                 <button class="nav-tab w-full text-left py-2.5 px-4 rounded-lg text-slate-700" data-page="page-rail">คำนวณรางม่าน</button>
                 <button class="nav-tab w-full text-left py-2.5 px-4 rounded-lg text-slate-700" data-page="page-roller">คำนวณม่านม้วน</button>
+                <button class="nav-tab w-full text-left py-2.5 px-4 rounded-lg text-slate-700" data-page="page-settings">ตั้งค่าข้อมูล</button>
             </nav>
         </aside>
 
@@ -185,6 +186,38 @@
                     </div>
                 </div>
 
+                <!-- New Settings Page -->
+                <div id="page-settings" class="page-content bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                    <div class="text-center mb-8"><h1 class="text-2xl md:text-3xl font-bold text-slate-800">ตั้งค่าข้อมูลบริษัทและลูกค้า</h1></div>
+                    <div class="space-y-6 max-w-2xl mx-auto">
+                        <!-- Company Info -->
+                        <div class="bg-slate-50 p-4 rounded-lg">
+                            <h2 class="text-xl font-bold text-slate-800 mb-4">ข้อมูลบริษัท</h2>
+                            <div><label for="companyName" class="block font-medium text-slate-700 mb-1">ชื่อบริษัท</label><input type="text" id="companyName" placeholder="ชื่อบริษัทของคุณ" class="w-full px-4 py-3 bg-white border rounded-lg"></div>
+                            <div class="mt-4"><label for="companyAddress" class="block font-medium text-slate-700 mb-1">ที่อยู่บริษัท</label><input type="text" id="companyAddress" placeholder="ที่อยู่บริษัทของคุณ" class="w-full px-4 py-3 bg-white border rounded-lg"></div>
+                            <div class="mt-4"><label for="companyPhone" class="block font-medium text-slate-700 mb-1">เบอร์โทรศัพท์</label><input type="text" id="companyPhone" placeholder="เบอร์โทรศัพท์บริษัท" class="w-full px-4 py-3 bg-white border rounded-lg"></div>
+                            <div class="mt-4"><label for="companyEmail" class="block font-medium text-slate-700 mb-1">อีเมล</label><input type="email" id="companyEmail" placeholder="อีเมลบริษัท" class="w-full px-4 py-3 bg-white border rounded-lg"></div>
+                        </div>
+
+                        <!-- Default Customer Info -->
+                        <div class="bg-slate-50 p-4 rounded-lg">
+                            <h2 class="text-xl font-bold text-slate-800 mb-4">ข้อมูลลูกค้าเริ่มต้น (สำหรับ PDF)</h2>
+                            <div><label for="defaultCustomerName" class="block font-medium text-slate-700 mb-1">ชื่อลูกค้าเริ่มต้น</label><input type="text" id="defaultCustomerName" placeholder="ชื่อลูกค้าเริ่มต้น" class="w-full px-4 py-3 bg-white border rounded-lg"></div>
+                            <div class="mt-4"><label for="defaultCustomerAddress" class="block font-medium text-slate-700 mb-1">ที่อยู่ลูกค้าเริ่มต้น</label><input type="text" id="defaultCustomerAddress" placeholder="ที่อยู่ลูกค้าเริ่มต้น" class="w-full px-4 py-3 bg-white border rounded-lg"></div>
+                            <div class="mt-4"><label for="defaultCustomerTaxId" class="block font-medium text-slate-700 mb-1">เลขประจำตัวผู้เสียภาษีเริ่มต้น</label><input type="text" id="defaultCustomerTaxId" placeholder="เลขประจำตัวผู้เสียภาษีเริ่มต้น" class="w-full px-4 py-3 bg-white border rounded-lg"></div>
+                        </div>
+
+                        <!-- Bank Info -->
+                        <div class="bg-slate-50 p-4 rounded-lg">
+                            <h2 class="text-xl font-bold text-slate-800 mb-4">ข้อมูลบัญชีธนาคาร</h2>
+                            <div><label for="bankName" class="block font-medium text-slate-700 mb-1">ชื่อธนาคาร</label><input type="text" id="bankName" placeholder="ชื่อธนาคาร" class="w-full px-4 py-3 bg-white border rounded-lg"></div>
+                            <div class="mt-4"><label for="accountName" class="block font-medium text-slate-700 mb-1">ชื่อบัญชี</label><input type="text" id="accountName" placeholder="ชื่อบัญชี" class="w-full px-4 py-3 bg-white border rounded-lg"></div>
+                            <div class="mt-4"><label for="accountNumber" class="block font-medium text-slate-700 mb-1">เลขที่บัญชี</label><input type="text" id="accountNumber" placeholder="เลขที่บัญชี" class="w-full px-4 py-3 bg-white border rounded-lg"></div>
+                        </div>
+
+                        <button id="saveSettingsBtn" class="btn btn-primary w-full text-white font-bold py-3 rounded-lg">บันทึกการตั้งค่า</button>
+                    </div>
+                </div>
 
                 <footer class="text-center mt-8 text-sm text-slate-400">
                     <p>&copy; 2024 Product Calculator</p>
@@ -270,14 +303,16 @@
                 pvc: document.getElementById('page-pvc'),
                 wood: document.getElementById('page-wood'),
                 rail: document.getElementById('page-rail'),
-                roller: document.getElementById('page-roller')
+                roller: document.getElementById('page-roller'),
+                settings: document.getElementById('page-settings') // Add new page element
             };
             const tabElements = {
                 blinds: document.querySelector('[data-page="page-blinds"]'),
                 pvc: document.querySelector('[data-page="page-pvc"]'),
                 wood: document.querySelector('[data-page="page-wood"]'),
                 rail: document.querySelector('[data-page="page-rail"]'),
-                roller: document.querySelector('[data-page="page-roller"]')
+                roller: document.querySelector('[data-page="page-roller"]'),
+                settings: document.querySelector('[data-page="page-settings"]') // Add new tab element
             };
             const adminLoginModal = document.getElementById('admin-login-modal');
             const adminPanelModal = document.getElementById('admin-panel-modal');
@@ -305,7 +340,7 @@
             const addPvcRow = () => {
                 const container = document.getElementById('pvc-rows-container');
                 pvcRowCount++;
-                if (pvcRowCount > 10) { alert('สามารถเพิ่มได้สูงสุด 10 รายการ'); pvcRowCount--; return; }
+                // Removed the 10-item limit check
                 const rowId = `pvc-row-${pvcRowCount}`;
                 const rowHtml = `<div id="${rowId}" class="calculation-row grid grid-cols-12 gap-2 items-center"><span class="col-span-1 text-center text-slate-500">${pvcRowCount}.</span><input type="number" step="any" placeholder="กว้าง (ซม.)" class="w-full p-2 border rounded-md col-span-3"><input type="number" step="any" placeholder="สูง (ซม.)" class="w-full p-2 border rounded-md col-span-3"><input type="number" value="1" placeholder="จำนวน" class="w-full p-2 border rounded-md col-span-3"><button data-row-id="${rowId}" class="remove-row-btn col-span-2 text-red-500 hover:text-red-700 font-bold">ลบ</button></div>`;
                 container.insertAdjacentHTML('beforeend', rowHtml);
@@ -321,7 +356,7 @@
             const addWoodRow = () => {
                 const container = document.getElementById('wood-rows-container');
                 let rowCounter = container.querySelectorAll('.calculation-row').length;
-                if (rowCounter >= 10) { alert('สามารถเพิ่มได้สูงสุด 10 รายการ'); return; }
+                // Removed the 10-item limit check
                 rowCounter++;
                 const rowId = `wood-row-${rowCounter}`;
                 const rowHtml = `
@@ -352,7 +387,7 @@
             const addRollerRow = () => {
                 const container = document.getElementById('roller-rows-container');
                 let rowCounter = container.querySelectorAll('.calculation-row').length;
-                if (rowCounter >= 10) { alert('สามารถเพิ่มได้สูงสุด 10 รายการ'); return; }
+                // Removed the 10-item limit check
                 rowCounter++;
                 const rowId = `roller-row-${rowCounter}`;
                 const rowHtml = `
@@ -383,7 +418,7 @@
             const addRailRow = () => {
                 const container = document.getElementById('rail-rows-container');
                 let currentRowCount = container.querySelectorAll('.calculation-row').length;
-                if (currentRowCount >= 10) { alert('สามารถเพิ่มได้สูงสุด 10 รายการ'); return; }
+                // Removed the 10-item limit check
                 currentRowCount++;
                 const rowHtml = `
                     <div class="calculation-row p-4 border rounded-lg space-y-3 bg-slate-50">
@@ -498,13 +533,14 @@
                     doc.setFillColor(255, 255, 204); // Light yellow
                     doc.rect(0, doc.internal.pageSize.height - 50, doc.internal.pageSize.width, 50, 'F'); 
 
-                    // --- Company Info (Placeholder, not mimicking hardcoded data) ---
+                    // --- Company Info (using appConfig.settings) ---
+                    const companySettings = appConfig.settings?.company || {};
                     doc.setFontSize(10);
                     doc.setTextColor(50, 50, 50); // Dark gray text
-                    doc.text('ชื่อบริษัทของคุณ', 20, 20); 
-                    doc.text('ที่อยู่บริษัทของคุณ', 20, 25); 
-                    doc.text('เบอร์โทรศัพท์: XXX-XXX-XXXX', 20, 30); 
-                    doc.text('อีเมล: your.email@example.com', 20, 35); 
+                    doc.text(companySettings.name || 'ชื่อบริษัทของคุณ', 20, 20); 
+                    doc.text(companySettings.address || 'ที่อยู่บริษัทของคุณ', 20, 25); 
+                    doc.text(companySettings.phone || 'เบอร์โทรศัพท์: XXX-XXX-XXXX', 20, 30); 
+                    doc.text(companySettings.email || 'อีเมล: your.email@example.com', 20, 35); 
 
                     // --- Document Title (using passed title, mimicking "ใบแจ้งหนี้" style) ---
                     doc.setFontSize(24);
@@ -524,18 +560,19 @@
 
                     let startY = 80; 
                     
-                    // --- Customer Info (using extraInfo if available, otherwise placeholders) ---
+                    // --- Customer Info (prioritize extraInfo, then appConfig.settings, then placeholders) ---
                     doc.setFontSize(10);
                     doc.setTextColor(50, 50, 50);
-                    // พยายามดึงข้อมูลลูกค้าจาก extraInfo, ถ้าไม่มีให้ใช้ placeholder
-                    const customerName = extraInfo.find(info => info.label === 'ชื่อลูกค้า')?.value || 'ชื่อลูกค้า: [ยังไม่ได้ระบุ]';
-                    const customerAddress = extraInfo.find(info => info.label === 'ที่อยู่ลูกค้า')?.value || 'ที่อยู่ลูกค้า: [ยังไม่ได้ระบุ]';
-                    const customerTaxId = extraInfo.find(info => info.label === 'เลขประจำตัวผู้เสียภาษี')?.value || 'เลขประจำตัวผู้เสียภาษี: [ยังไม่ได้ระบุ]';
+                    const defaultCustomerSettings = appConfig.settings?.defaultCustomer || {};
+
+                    const customerName = extraInfo.find(info => info.label === 'ชื่อลูกค้า')?.value || defaultCustomerSettings.name || 'ชื่อลูกค้า: [ยังไม่ได้ระบุ]';
+                    const customerAddress = extraInfo.find(info => info.label === 'ที่อยู่ลูกค้า')?.value || defaultCustomerSettings.address || 'ที่อยู่ลูกค้า: [ยังไม่ได้ระบุ]';
+                    const customerTaxId = extraInfo.find(info => info.label === 'เลขประจำตัวผู้เสียภาษี')?.value || defaultCustomerSettings.taxId || 'เลขประจำตัวผู้เสียภาษี: [ยังไม่ได้ระบุ]';
 
                     doc.text(customerName, 20, startY);
                     doc.text(customerAddress, 20, startY + 5);
                     doc.text(customerTaxId, 20, startY + 10);
-                    startY += 20; // เลื่อนตำแหน่ง Y สำหรับตาราง
+                    startY += 20; // Move Y position for table
 
                     // --- Table ---
                     doc.autoTable({
@@ -559,15 +596,16 @@
                     doc.setFontSize(12);
                     doc.setTextColor(50, 50, 50);
                     
-                    // แสดงเฉพาะยอดรวมสุทธิที่มาจากข้อมูลปัจจุบัน
+                    // Display only the total from current data
                     doc.text('ยอดรวมสุทธิ:', 140, finalY + 10);
                     doc.text(`THB ${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`, 200, finalY + 10, { align: 'right' });
 
-                    // --- Notes/Bank Info (simplified, using placeholders) ---
+                    // --- Notes/Bank Info (using appConfig.settings) ---
+                    const bankSettings = appConfig.settings?.bank || {};
                     doc.text('หมายเหตุ:', 20, finalY + 45); 
-                    doc.text('การชำระเงินผ่านธนาคาร: [ชื่อธนาคาร]', 20, finalY + 50);
-                    doc.text('ชื่อบัญชี: [ชื่อบัญชี]', 20, finalY + 55);
-                    doc.text('เลขที่บัญชี: [เลขที่บัญชี]', 20, finalY + 60);
+                    doc.text(`การชำระเงินผ่านธนาคาร: ${bankSettings.name || '[ชื่อธนาคาร]'}`, 20, finalY + 50);
+                    doc.text(`ชื่อบัญชี: ${bankSettings.accountName || '[ชื่อบัญชี]'}`, 20, finalY + 55);
+                    doc.text(`เลขที่บัญชี: ${bankSettings.accountNumber || '[เลขที่บัญชี]'}`, 20, finalY + 60);
 
                     // --- Signature Boxes (dynamic dates) ---
                     const signatureBoxY = finalY + 85; 
@@ -632,7 +670,7 @@
                 const lookupKey = `${roundedWidth}x${roundedHeight}`;
                 document.getElementById('blindsRoundedSize').textContent = `(ขนาดที่ใช้คำนวณ: ${roundedWidth}x${roundedHeight})`;
                 const API_KEY = 'AIzaSyDo8Vmy2yspXDKJ-nq3Yp7lPqeCXmQIlsA', SPREADSHEET_ID = '10rXzhR4bqKNj17Kk7uSNnOIJQCMjIBYQCOt21g5Zmow', RANGES = ['sheet1!A:B', 'sheet2!A:B'];
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEED_ID}/values:batchGet?ranges=${RANGES.join('&ranges=')}&key=${API_KEY}`;
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values:batchGet?ranges=${RANGES.join('&ranges=')}&key=${API_KEY}`;
                 try {
                     const response = await fetch(url); const data = await response.json();
                     if (!response.ok) throw new Error(data.error.message || 'Error'); if (!data.valueRanges || data.valueRanges.length < 2) { errorDiv.textContent = 'รูปแบบข้อมูล API ไม่ถูกต้อง'; return; }
@@ -972,7 +1010,7 @@
             };
 
             const updateUIWithConfig = () => {
-                const visibility = appConfig.pageVisibility || { blinds: true, pvc: true, wood: true, rail: true, roller: true };
+                const visibility = appConfig.pageVisibility || { blinds: true, pvc: true, wood: true, rail: true, roller: true, settings: true }; // Add settings visibility
                 let firstVisiblePage = null;
                 Object.keys(visibility).forEach(pageKey => {
                     const isVisible = visibility[pageKey];
@@ -1010,11 +1048,25 @@
                     }
                 }
                 populateRollerDropdowns();
+
+                // Populate settings fields
+                const settings = appConfig.settings || {};
+                document.getElementById('companyName').value = settings.company?.name || '';
+                document.getElementById('companyAddress').value = settings.company?.address || '';
+                document.getElementById('companyPhone').value = settings.company?.phone || '';
+                document.getElementById('companyEmail').value = settings.company?.email || '';
+                document.getElementById('defaultCustomerName').value = settings.defaultCustomer?.name || '';
+                document.getElementById('defaultCustomerAddress').value = settings.defaultCustomer?.address || '';
+                document.getElementById('defaultCustomerTaxId').value = settings.defaultCustomer?.taxId || '';
+                document.getElementById('bankName').value = settings.bank?.name || '';
+                document.getElementById('accountName').value = settings.bank?.accountName || '';
+                document.getElementById('accountNumber').value = settings.bank?.accountNumber || '';
+
             };
 
             const initializeAppConfig = async () => {
                 const defaultConfig = {
-                    pageVisibility: { blinds: true, pvc: true, wood: true, rail: true, roller: true },
+                    pageVisibility: { blinds: true, pvc: true, wood: true, rail: true, roller: true, settings: true }, // Add settings visibility
                     prices: {
                         pvc: [ { text: "320 - ฉากทึบ 10CM", value: 320 }, { text: "349 - ฉากทึบ 8.5CM", value: 349 }, { text: "799 - ฉากญี่ปุ่น", value: 799 }, { text: "899 - ฉากยูโร LA", value: 899 }, { text: "999 - ฉากยูโร LB", value: 999 } ],
                         wood: [ { text: "799 - ไม้โฟมวูด", value: 799 }, { text: "820 - ไม้บาสวูด", value: 820 } ],
@@ -1035,6 +1087,11 @@
                             "ARISO": { price: 349, codes: ["MED-0062", "MED-0064", "MED-0065", "MED-0066", "MED-0067"]}
                           }
                         }
+                    },
+                    settings: { // Default settings structure
+                        company: { name: '', address: '', phone: '', email: '' },
+                        defaultCustomer: { name: '', address: '', taxId: '' },
+                        bank: { name: '', accountName: '', accountNumber: '' }
                     }
                 };
                 appConfig = defaultConfig;
@@ -1048,6 +1105,8 @@
                          if (!appConfig.prices.roller) { appConfig.prices.roller = defaultConfig.prices.roller; }
                          if (!appConfig.pageVisibility) { appConfig.pageVisibility = defaultConfig.pageVisibility; }
                          if (appConfig.pageVisibility.roller === undefined) { appConfig.pageVisibility.roller = defaultConfig.pageVisibility.roller; }
+                         if (appConfig.pageVisibility.settings === undefined) { appConfig.pageVisibility.settings = defaultConfig.pageVisibility.settings; } // Ensure settings visibility is set
+                         if (!appConfig.settings) { appConfig.settings = defaultConfig.settings; } // Ensure settings are initialized
                         updateUIWithConfig();
                     } else {
                         setDoc(configRef, defaultConfig);
@@ -1129,6 +1188,45 @@
 
                 await setDoc(doc(db, `artifacts/${appId}/public/data/config/main`), newConfig);
                 alert('บันทึกการเปลี่ยนแปลงแล้ว'); adminPanelModal.style.display = 'none';
+            };
+
+            // New function to save settings
+            const saveSettings = async () => {
+                const newSettings = {
+                    company: {
+                        name: document.getElementById('companyName').value.trim(),
+                        address: document.getElementById('companyAddress').value.trim(),
+                        phone: document.getElementById('companyPhone').value.trim(),
+                        email: document.getElementById('companyEmail').value.trim(),
+                    },
+                    defaultCustomer: {
+                        name: document.getElementById('defaultCustomerName').value.trim(),
+                        address: document.getElementById('defaultCustomerAddress').value.trim(),
+                        taxId: document.getElementById('defaultCustomerTaxId').value.trim(),
+                    },
+                    bank: {
+                        name: document.getElementById('bankName').value.trim(),
+                        accountName: document.getElementById('accountName').value.trim(),
+                        accountNumber: document.getElementById('accountNumber').value.trim(),
+                    }
+                };
+
+                try {
+                    const configRef = doc(db, `artifacts/${appId}/public/data/config/main`);
+                    // Fetch current config to merge settings, or create if not exists
+                    const docSnap = await getDoc(configRef);
+                    let currentConfig = {};
+                    if (docSnap.exists()) {
+                        currentConfig = docSnap.data();
+                    }
+                    // Merge new settings into current config
+                    const updatedConfig = { ...currentConfig, settings: newSettings };
+                    await setDoc(configRef, updatedConfig);
+                    alert('บันทึกการตั้งค่าสำเร็จ!');
+                } catch (e) {
+                    console.error("Error saving settings: ", e);
+                    alert('เกิดข้อผิดพลาดในการบันทึกการตั้งค่า: ' + e.message);
+                }
             };
             
             // --- START: Admin Panel Dynamic Functions ---
@@ -1388,6 +1486,9 @@
                 } else { document.getElementById('login-error').textContent = 'Username หรือ Password ไม่ถูกต้อง'; }
             });
             document.getElementById('admin-save-btn').addEventListener('click', saveAdminChanges);
+            // Add event listener for save settings button
+            document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+
             document.getElementById('add-pvc-price-btn').addEventListener('click', () => document.getElementById('pvc-price-controls').appendChild(createPriceItemHTML()));
             document.getElementById('add-wood-price-btn').addEventListener('click', () => document.getElementById('wood-price-controls').appendChild(createPriceItemHTML()));
 
