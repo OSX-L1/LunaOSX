@@ -481,7 +481,7 @@
                     const doc = new jsPDF();
 
                     // ตรวจสอบว่าข้อมูลฟอนต์ Sarabun_Regular_normal มีอยู่และไม่ว่างเปล่า
-                    if (!window.Sarabun_Regular_normal || window.Sarabun_Regular_normal.length < 100) { // ตรวจสอบความยาวขั้นต่ำเพื่อยืนยันว่าข้อมูลสมบูรณ์
+                    if (!window.Sarabun_Regular_normal || window.Sarabun_Regular_normal.length < 100) { 
                         throw new Error("ข้อมูลฟอนต์ Sarabun_Regular_normal ไม่สมบูรณ์หรือไม่พบ กรุณาตรวจสอบการฝังฟอนต์ในโค้ด");
                     }
 
@@ -489,131 +489,106 @@
                     doc.addFont("Sarabun-Regular-normal.ttf", "Sarabun-Regular", "normal");
                     doc.setFont("Sarabun-Regular", "normal");
                     
-                    // กำหนดสีพื้นหลังและข้อความสำหรับส่วนหัวของเอกสาร (เลียนแบบสีฟ้าและเหลือง)
-                    // สีฟ้าอ่อน
-                    doc.setFillColor(230, 247, 255); // RGB for a light blue
-                    doc.rect(0, 0, doc.internal.pageSize.width, 50, 'F'); // วาดสี่เหลี่ยมผืนผ้าที่ด้านบน
+                    // --- Header and Footer background colors (mimicking the image) ---
+                    // Light blue header background
+                    doc.setFillColor(230, 247, 255); // Light blue
+                    doc.rect(0, 0, doc.internal.pageSize.width, 50, 'F'); 
                     
-                    // สีเหลืองอ่อน
-                    doc.setFillColor(255, 255, 204); // RGB for a light yellow
-                    doc.rect(0, doc.internal.pageSize.height - 50, doc.internal.pageSize.width, 50, 'F'); // วาดสี่เหลี่ยมผืนผ้าที่ด้านล่าง
+                    // Light yellow footer background
+                    doc.setFillColor(255, 255, 204); // Light yellow
+                    doc.rect(0, doc.internal.pageSize.height - 50, doc.internal.pageSize.width, 50, 'F'); 
 
-                    // เพิ่มโลโก้และข้อมูลบริษัท (ปรับตำแหน่งและขนาดตามความเหมาะสม)
-                    // ตัวอย่าง: doc.addImage(imageData, 'PNG', 10, 10, 40, 10);
+                    // --- Company Info (Placeholder, not mimicking hardcoded data) ---
                     doc.setFontSize(10);
-                    doc.setTextColor(50, 50, 50); // สีเทาเข้ม
-                    doc.text('Larana, Inc.', 20, 20);
-                    doc.text('ที่อยู่: 123 Anywhere St., Any City, ST 12345', 20, 25);
-                    doc.text('เบอร์โทรศัพท์: 123-456-7890', 20, 30);
-                    doc.text('อีเมล: hello@reallygreatsite.com', 20, 35);
+                    doc.setTextColor(50, 50, 50); // Dark gray text
+                    doc.text('ชื่อบริษัทของคุณ', 20, 20); 
+                    doc.text('ที่อยู่บริษัทของคุณ', 20, 25); 
+                    doc.text('เบอร์โทรศัพท์: XXX-XXX-XXXX', 20, 30); 
+                    doc.text('อีเมล: your.email@example.com', 20, 35); 
 
-                    // เพิ่มหัวข้อ "ใบแจ้งหนี้" และ "INVOICE"
+                    // --- Document Title (using passed title, mimicking "ใบแจ้งหนี้" style) ---
                     doc.setFontSize(24);
-                    doc.setTextColor(220, 38, 38); // สีแดง
-                    doc.text('ใบแจ้งหนี้', doc.internal.pageSize.width - 20, 25, { align: 'right' });
+                    doc.setTextColor(220, 38, 38); // Red color
+                    doc.text(title, doc.internal.pageSize.width - 20, 25, { align: 'right' }); 
                     doc.setFontSize(18);
-                    doc.text('INVOICE', doc.internal.pageSize.width - 20, 35, { align: 'right' });
+                    doc.text('Quotation', doc.internal.pageSize.width - 20, 35, { align: 'right' }); 
 
-                    // เพิ่มกล่อง "เลขที่" และ "วันที่"
-                    doc.setFillColor(255, 255, 204); // สีเหลืองอ่อน
+                    // --- Quotation Number and Date Box (dynamic date, placeholder number) ---
+                    const today = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+                    doc.setFillColor(255, 255, 204); // Light yellow
                     doc.roundedRect(doc.internal.pageSize.width - 60, 50, 40, 15, 3, 3, 'F');
                     doc.setFontSize(10);
                     doc.setTextColor(50, 50, 50);
-                    doc.text('เลขที่: 01234', doc.internal.pageSize.width - 40, 55, { align: 'center' });
-                    doc.text('วันที่: 09.09.2026', doc.internal.pageSize.width - 40, 60, { align: 'center' });
+                    doc.text('เลขที่: [Auto Gen]', doc.internal.pageSize.width - 40, 55, { align: 'center' }); 
+                    doc.text(`วันที่: ${today}`, doc.internal.pageSize.width - 40, 60, { align: 'center' });
 
-
-                    let startY = 80; // เริ่มต้นเนื้อหาหลักหลังจากส่วนหัว
+                    let startY = 80; 
                     
-                    // เพิ่มข้อมูล "ชื่อลูกค้า" และ "ที่อยู่"
+                    // --- Customer Info (using extraInfo if available, otherwise placeholders) ---
                     doc.setFontSize(10);
                     doc.setTextColor(50, 50, 50);
-                    doc.text('ชื่อลูกค้า: แอลเอโอไนน์ ฟิล์มเมอร์รัสตัน', 20, startY);
-                    doc.text('ที่อยู่: 123 Anywhere St., Any City, ST 12345', 20, startY + 5);
-                    doc.text('เลขประจำตัวผู้เสียภาษี: 0123 4567 8901 2345', 20, startY + 10);
+                    // พยายามดึงข้อมูลลูกค้าจาก extraInfo, ถ้าไม่มีให้ใช้ placeholder
+                    const customerName = extraInfo.find(info => info.label === 'ชื่อลูกค้า')?.value || 'ชื่อลูกค้า: [ยังไม่ได้ระบุ]';
+                    const customerAddress = extraInfo.find(info => info.label === 'ที่อยู่ลูกค้า')?.value || 'ที่อยู่ลูกค้า: [ยังไม่ได้ระบุ]';
+                    const customerTaxId = extraInfo.find(info => info.label === 'เลขประจำตัวผู้เสียภาษี')?.value || 'เลขประจำตัวผู้เสียภาษี: [ยังไม่ได้ระบุ]';
+
+                    doc.text(customerName, 20, startY);
+                    doc.text(customerAddress, 20, startY + 5);
+                    doc.text(customerTaxId, 20, startY + 10);
                     startY += 20; // เลื่อนตำแหน่ง Y สำหรับตาราง
 
+                    // --- Table ---
                     doc.autoTable({
                         head: [columns],
                         body: body,
-                        startY: startY, // ใช้ startY ที่คำนวณไว้
+                        startY: startY, 
                         theme: 'grid',
-                        // ปรับแต่ง headStyles สำหรับธีมตามรูปภาพ
                         headStyles: { 
                             font: "Sarabun-Regular", 
                             fontStyle: 'bold', 
-                            fillColor: [100, 181, 246], // สีฟ้าอ่อน (#64b5f6)
-                            textColor: 255 // สีขาว
+                            fillColor: [100, 181, 246], // Light blue (#64b5f6)
+                            textColor: 255 // White
                         },
-                        styles: { font: "Sarabun-Regular", fontStyle: 'normal', textColor: [50, 50, 50] }, // สีข้อความในตาราง
-                        alternateRowStyles: { fillColor: [240, 240, 240] } // สีสลับแถว
+                        styles: { font: "Sarabun-Regular", fontStyle: 'normal', textColor: [50, 50, 50] }, 
+                        alternateRowStyles: { fillColor: [240, 240, 240] } 
                     });
 
                     let finalY = doc.lastAutoTable.finalY;
 
-                    // ส่วนสรุปยอดรวม (เลียนแบบฟอร์ม)
+                    // --- Summary Section (simplified to only show total, no hardcoded discounts/VAT) ---
                     doc.setFontSize(12);
                     doc.setTextColor(50, 50, 50);
                     
-                    // จำนวนเงิน (ซ้ายล่าง)
-                    doc.text('จำนวนเงิน', 20, finalY + 10);
-                    doc.text('Amount', 20, finalY + 15);
-                    doc.text('หนึ่งหมื่นเจ็ดร้อยบาทถ้วน', 20, finalY + 25);
-                    doc.text('Ten thousand seven hundred baht', 20, finalY + 30);
+                    // แสดงเฉพาะยอดรวมสุทธิที่มาจากข้อมูลปัจจุบัน
+                    doc.text('ยอดรวมสุทธิ:', 140, finalY + 10);
+                    doc.text(`THB ${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`, 200, finalY + 10, { align: 'right' });
 
-                    // รวมเป็นเงิน (ขวาล่าง)
-                    doc.text('รวมเป็นเงิน', 140, finalY + 10);
-                    doc.text('Subtotal', 140, finalY + 15);
-                    doc.text(`${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`, 200, finalY + 15, { align: 'right' });
+                    // --- Notes/Bank Info (simplified, using placeholders) ---
+                    doc.text('หมายเหตุ:', 20, finalY + 45); 
+                    doc.text('การชำระเงินผ่านธนาคาร: [ชื่อธนาคาร]', 20, finalY + 50);
+                    doc.text('ชื่อบัญชี: [ชื่อบัญชี]', 20, finalY + 55);
+                    doc.text('เลขที่บัญชี: [เลขที่บัญชี]', 20, finalY + 60);
 
-                    // หักส่วนลด
-                    doc.text('หักส่วนลด', 140, finalY + 25);
-                    doc.text('Discount', 140, finalY + 30);
-                    doc.text('1,000.00', 200, finalY + 30, { align: 'right' }); // ตัวอย่างส่วนลด
-
-                    // ยอดรวมหลังหักส่วนลด
-                    doc.text('ยอดรวมหลังหักส่วนลด', 140, finalY + 40);
-                    doc.text('After Discount', 140, finalY + 45);
-                    doc.text('10,000.00', 200, finalY + 45, { align: 'right' }); // ตัวอย่างยอดรวมหลังหักส่วนลด
-
-                    // จำนวนภาษีมูลค่าเพิ่ม 7%
-                    doc.text('จำนวนภาษีมูลค่าเพิ่ม 7%', 140, finalY + 55);
-                    doc.text('Value Added Tax', 140, finalY + 60);
-                    doc.text('700.00', 200, finalY + 60, { align: 'right' }); // ตัวอย่าง VAT
-
-                    // รวมเป็นเงิน (สุดท้าย)
-                    doc.text('รวมเป็นเงิน', 140, finalY + 70);
-                    doc.text('Subtotal', 140, finalY + 75);
-                    doc.text(`THB ${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`, 200, finalY + 75, { align: 'right' });
-
-
-                    // หมายเหตุ
-                    doc.text('หมายเหตุ', 20, finalY + 45);
-                    doc.text('การชำระเงินผ่านธนาคาร', 20, finalY + 50);
-                    doc.text('ชื่อบัญชี: อัลเฟรด ออร์เรล', 20, finalY + 55);
-                    doc.text('เลขที่บัญชี: 0123-456-78901', 20, finalY + 60);
-
-                    // ส่วนลายเซ็น (เลียนแบบกล่อง)
-                    const boxY = finalY + 85;
+                    // --- Signature Boxes (dynamic dates) ---
+                    const signatureBoxY = finalY + 85; 
                     const boxWidth = 55;
                     const boxHeight = 20;
                     const boxSpacing = 10;
 
                     // ผู้รับสินค้า
-                    doc.rect(20, boxY, boxWidth, boxHeight);
-                    doc.text('ผู้รับสินค้า', 20 + boxWidth / 2, boxY + 10, { align: 'center' });
-                    doc.text('วันที่', 20 + boxWidth / 2, boxY + 15, { align: 'center' });
+                    doc.rect(20, signatureBoxY, boxWidth, boxHeight);
+                    doc.text('ผู้รับสินค้า', 20 + boxWidth / 2, signatureBoxY + 10, { align: 'center' });
+                    doc.text(`วันที่: ${today}`, 20 + boxWidth / 2, signatureBoxY + 15, { align: 'center' });
 
                     // ผู้ส่งสินค้า
-                    doc.rect(20 + boxWidth + boxSpacing, boxY, boxWidth, boxHeight);
-                    doc.text('ผู้ส่งสินค้า', 20 + boxWidth + boxSpacing + boxWidth / 2, boxY + 10, { align: 'center' });
-                    doc.text('วันที่', 20 + boxWidth + boxSpacing + boxWidth / 2, boxY + 15, { align: 'center' });
+                    doc.rect(20 + boxWidth + boxSpacing, signatureBoxY, boxWidth, boxHeight);
+                    doc.text('ผู้ส่งสินค้า', 20 + boxWidth + boxSpacing + boxWidth / 2, signatureBoxY + 10, { align: 'center' });
+                    doc.text(`วันที่: ${today}`, 20 + boxWidth + boxSpacing + boxWidth / 2, signatureBoxY + 15, { align: 'center' });
 
                     // ผู้ดูแลลูกค้า
-                    doc.rect(20 + (boxWidth + boxSpacing) * 2, boxY, boxWidth, boxHeight);
-                    doc.text('ผู้ดูแลลูกค้า', 20 + (boxWidth + boxSpacing) * 2 + boxWidth / 2, boxY + 10, { align: 'center' });
-                    doc.text('วันที่', 20 + (boxWidth + boxSpacing) * 2 + boxWidth / 2, boxY + 15, { align: 'center' });
-
+                    doc.rect(20 + (boxWidth + boxSpacing) * 2, signatureBoxY, boxWidth, boxHeight);
+                    doc.text('ผู้ดูแลลูกค้า', 20 + (boxWidth + boxSpacing) * 2 + boxWidth / 2, signatureBoxY + 10, { align: 'center' });
+                    doc.text(`วันที่: ${today}`, 20 + (boxWidth + boxSpacing) * 2 + boxWidth / 2, signatureBoxY + 15, { align: 'center' });
 
                     doc.save(filename);
                 } catch (e) {
@@ -657,7 +632,7 @@
                 const lookupKey = `${roundedWidth}x${roundedHeight}`;
                 document.getElementById('blindsRoundedSize').textContent = `(ขนาดที่ใช้คำนวณ: ${roundedWidth}x${roundedHeight})`;
                 const API_KEY = 'AIzaSyDo8Vmy2yspXDKJ-nq3Yp7lPqeCXmQIlsA', SPREADSHEET_ID = '10rXzhR4bqKNj17Kk7uSNnOIJQCMjIBYQCOt21g5Zmow', RANGES = ['sheet1!A:B', 'sheet2!A:B'];
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values:batchGet?ranges=${RANGES.join('&ranges=')}&key=${API_KEY}`;
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEED_ID}/values:batchGet?ranges=${RANGES.join('&ranges=')}&key=${API_KEY}`;
                 try {
                     const response = await fetch(url); const data = await response.json();
                     if (!response.ok) throw new Error(data.error.message || 'Error'); if (!data.valueRanges || data.valueRanges.length < 2) { errorDiv.textContent = 'รูปแบบข้อมูล API ไม่ถูกต้อง'; return; }
