@@ -82,7 +82,10 @@
         <div class="flex-1 flex flex-col">
             
             <header class="bg-white/80 backdrop-blur-sm shadow-sm p-4 flex justify-end items-center sticky top-0 md:relative z-10">
-                 <button id="admin-login-btn" class="text-sm font-medium text-slate-600 hover:text-blue-600 transition">ผู้ดูแลระบบ</button>
+                 <button id="auth-btn" class="text-sm font-medium text-slate-600 hover:text-blue-600 transition">เข้าสู่ระบบ / สมัครสมาชิก</button>
+                 <button id="admin-login-btn" class="text-sm font-medium text-slate-600 hover:text-blue-600 transition ml-4 hidden">ผู้ดูแลระบบ</button>
+                 <button id="logout-btn" class="text-sm font-medium text-red-600 hover:text-red-800 transition ml-4 hidden">ออกจากระบบ</button>
+                 <span id="user-display" class="text-sm font-medium text-slate-700 ml-4 hidden"></span>
             </header>
 
             <main class="p-4 md:p-6 flex-1">
@@ -227,11 +230,41 @@
 
     </div>
 
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal-overlay">
+        <div class="modal-box w-full max-w-sm">
+            <h2 id="auth-modal-title" class="text-2xl font-bold text-center mb-6">เข้าสู่ระบบ</h2>
+            <div class="space-y-4">
+                <div>
+                    <label for="auth-email">อีเมล</label>
+                    <input id="auth-email" type="email" class="w-full p-3 border rounded-md" placeholder="your.email@example.com">
+                </div>
+                <div>
+                    <label for="auth-password">รหัสผ่าน</label>
+                    <input id="auth-password" type="password" class="w-full p-3 border rounded-md" placeholder="********">
+                </div>
+                <p id="auth-error" class="text-red-500 text-sm text-center"></p>
+                <button id="auth-submit-btn" class="btn btn-primary w-full text-white py-3 rounded-md font-bold">เข้าสู่ระบบ</button>
+                <button id="toggle-auth-mode-btn" class="w-full text-blue-500 py-2 mt-2">ยังไม่มีบัญชี? สมัครสมาชิก</button>
+                <button id="auth-close-btn" class="w-full text-slate-500 py-2 mt-2">ปิด</button>
+            </div>
+        </div>
+    </div>
+
     <div id="admin-login-modal" class="modal-overlay">
-        <div class="modal-box w-full max-w-sm"><h2 class="text-2xl font-bold text-center mb-6">ผู้ดูแลระบบ</h2><div class="space-y-4"><div><label for="username">Username</label><input id="username" type="text" class="w-full p-3 border rounded-md"></div><div><label for="password">Password</label><input id="password" type="password" class="w-full p-3 border rounded-md"></div><p id="login-error" class="text-red-500 text-sm text-center"></p><button id="login-submit-btn" class="btn btn-primary w-full text-white py-3 rounded-md font-bold">เข้าสู่ระบบ</button><button id="login-close-btn" class="w-full text-slate-500 py-2 mt-2">ปิด</button></div></div>
+        <div class="modal-box w-full max-w-sm"><h2 class="text-2xl font-bold text-center mb-6">ผู้ดูแลระบบ (สำหรับ Admin Login เดิม)</h2><div class="space-y-4"><div><label for="username">Username</label><input id="username" type="text" class="w-full p-3 border rounded-md"></div><div><label for="password">Password</label><input id="password" type="password" class="w-full p-3 border rounded-md"></div><p id="login-error" class="text-red-500 text-sm text-center"></p><button id="login-submit-btn" class="btn btn-primary w-full text-white py-3 rounded-md font-bold">เข้าสู่ระบบ</button><button id="login-close-btn" class="w-full text-slate-500 py-2 mt-2">ปิด</button></div></div>
     </div>
     <div id="admin-panel-modal" class="modal-overlay items-start justify-center py-10 overflow-y-auto">
-        <div class="modal-box w-full max-w-4xl"><div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold">แผงควบคุมผู้ดูแล</h2><button id="admin-panel-close-btn" class="text-2xl">&times;</button></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">การแสดงผลหน้าเว็บ</h3><div id="visibility-controls" class="space-y-2"></div></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการราคาฉากกั้นแอร์</h3><div id="pvc-price-controls" class="space-y-2"></div><button id="add-pvc-price-btn" class="mt-2 text-sm bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">+ เพิ่มราคา</button></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการราคามู่ลี่ไม้</h3><div id="wood-price-controls" class="space-y-2"></div><button id="add-wood-price-btn" class="mt-2 text-sm bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">+ เพิ่มราคา</button></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการราคารางม่าน</h3><div id="rail-price-controls" class="space-y-2"></div></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการราคาม่านม้วน</h3><div id="roller-price-controls" class="space-y-4"></div></div><button id="admin-save-btn" class="btn btn-secondary w-full text-white py-3 rounded-md font-bold mb-8">บันทึกการเปลี่ยนแปลง</button><div><h3 class="text-lg font-bold border-b pb-2 mb-3">ใบเสนอราคาที่บันทึกไว้</h3><div id="saved-quotations-list" class="space-y-2 max-h-64 overflow-y-auto"></div></div></div>
+        <div class="modal-box w-full max-w-4xl"><div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold">แผงควบคุมผู้ดูแล</h2><button id="admin-panel-close-btn" class="text-2xl">&times;</button></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">การแสดงผลหน้าเว็บ</h3><div id="visibility-controls" class="space-y-2"></div></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการราคาฉากกั้นแอร์</h3><div id="pvc-price-controls" class="space-y-2"></div><button id="add-pvc-price-btn" class="mt-2 text-sm bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">+ เพิ่มราคา</button></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการราคามู่ลี่ไม้</h3><div id="wood-price-controls" class="space-y-2"></div><button id="add-wood-price-btn" class="mt-2 text-sm bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">+ เพิ่มราคา</button></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการราคารางม่าน</h3><div id="rail-price-controls" class="space-y-2"></div></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการราคาม่านม้วน</h3><div id="roller-price-controls" class="space-y-4"></div></div>
+            <!-- New: User Management Section Placeholder -->
+            <div class="mb-6">
+                <h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการผู้ใช้</h3>
+                <div id="user-management-controls" class="space-y-2">
+                    <p class="text-slate-500">ส่วนนี้จะแสดงรายการผู้ใช้และให้ผู้ดูแลสามารถแก้ไขบทบาทหรือสิทธิ์ได้ (ต้องพัฒนาเพิ่มเติม)</p>
+                    <ul id="user-list" class="space-y-2"></ul>
+                </div>
+            </div>
+            <button id="admin-save-btn" class="btn btn-secondary w-full text-white py-3 rounded-md font-bold mb-8">บันทึกการเปลี่ยนแปลง</button><div><h3 class="text-lg font-bold border-b pb-2 mb-3">ใบเสนอราคาที่บันทึกไว้</h3><div id="saved-quotations-list" class="space-y-2 max-h-64 overflow-y-auto"></div></div></div>
     </div>
     <div id="view-quote-modal" class="modal-overlay items-start justify-center py-10 overflow-y-auto">
         <div class="modal-box w-full max-w-xl"><div class="flex justify-between items-center mb-4"><h2 id="view-quote-title" class="text-xl font-bold">รายละเอียดใบเสนอราคา</h2><button id="view-quote-close-btn" class="text-2xl">&times;</button></div><div id="view-quote-content" class="text-sm"></div></div>
@@ -262,8 +295,12 @@
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, deleteDoc, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, deleteDoc, query, serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { 
+            getAuth, signInAnonymously, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD2j3fg01Cl-mcl3z7iB-dIglS5zhyAu-g",
@@ -281,18 +318,70 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        let currentUser = null;
+        let isLoggedIn = false;
+        let isAdmin = false;
+        let userRole = 'anonymous'; // Default role
+        let userPermissions = {}; // Permissions based on user's role
 
         document.addEventListener('DOMContentLoaded', async () => {
 
-            try {
-                await signInAnonymously(auth);
-                console.log("Signed in anonymously to Firebase.");
-            } catch (error) {
-                console.error("Anonymous sign-in failed:", error);
+            // Listen for authentication state changes
+            onAuthStateChanged(auth, async (user) => {
+                currentUser = user;
+                isLoggedIn = !!user;
+                
+                const authBtn = document.getElementById('auth-btn');
+                const logoutBtn = document.getElementById('logout-btn');
+                const userDisplay = document.getElementById('user-display');
+                const adminLoginBtn = document.getElementById('admin-login-btn');
+
+                if (user) {
+                    authBtn.classList.add('hidden');
+                    logoutBtn.classList.remove('hidden');
+                    userDisplay.classList.remove('hidden');
+                    userDisplay.textContent = `ผู้ใช้: ${user.email || 'ไม่ระบุอีเมล'} (UID: ${user.uid.substring(0, 6)}...)`;
+
+                    // Fetch user role from Firestore
+                    const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}`);
+                    const userDocSnap = await getDoc(userDocRef);
+
+                    if (userDocSnap.exists()) {
+                        userRole = userDocSnap.data().role || 'user';
+                    } else {
+                        // If user document doesn't exist, create it with default 'user' role
+                        await setDoc(userDocRef, { role: 'user', createdAt: serverTimestamp() });
+                        userRole = 'user';
+                    }
+                    isAdmin = (userRole === 'admin');
+                    if (isAdmin) {
+                        adminLoginBtn.classList.remove('hidden'); // Show original admin login for now, will be replaced by user management
+                    } else {
+                        adminLoginBtn.classList.add('hidden');
+                    }
+                } else {
+                    authBtn.classList.remove('hidden');
+                    logoutBtn.classList.add('hidden');
+                    userDisplay.classList.add('hidden');
+                    adminLoginBtn.classList.add('hidden');
+                    userRole = 'anonymous';
+                    isAdmin = false;
+                }
+                // Re-initialize app config to apply new permissions based on role
+                initializeAppConfig(); 
+            });
+
+            // Initial anonymous sign-in (if no user is logged in)
+            if (!auth.currentUser) {
+                try {
+                    await signInAnonymously(auth);
+                    console.log("Signed in anonymously to Firebase.");
+                } catch (error) {
+                    console.error("Anonymous sign-in failed:", error);
+                }
             }
 
             let appConfig = {};
-            let isLoggedIn = false;
             let blindsCalculatedData = null, pvcCalculatedData = null, woodCalculatedData = null, railCalculatedData = null, rollerCalculatedData = null;
             let pvcRowCount = 0;
             let initialPageSet = false;
@@ -304,7 +393,7 @@
                 wood: document.getElementById('page-wood'),
                 rail: document.getElementById('page-rail'),
                 roller: document.getElementById('page-roller'),
-                settings: document.getElementById('page-settings') // Add new page element
+                settings: document.getElementById('page-settings')
             };
             const tabElements = {
                 blinds: document.querySelector('[data-page="page-blinds"]'),
@@ -312,8 +401,17 @@
                 wood: document.querySelector('[data-page="page-wood"]'),
                 rail: document.querySelector('[data-page="page-rail"]'),
                 roller: document.querySelector('[data-page="page-roller"]'),
-                settings: document.querySelector('[data-page="page-settings"]') // Add new tab element
+                settings: document.querySelector('[data-page="page-settings"]')
             };
+            const authModal = document.getElementById('auth-modal');
+            const authModalTitle = document.getElementById('auth-modal-title');
+            const authEmailInput = document.getElementById('auth-email');
+            const authPasswordInput = document.getElementById('auth-password');
+            const authErrorDisplay = document.getElementById('auth-error');
+            const authSubmitBtn = document.getElementById('auth-submit-btn');
+            const toggleAuthModeBtn = document.getElementById('toggle-auth-mode-btn');
+            const authCloseBtn = document.getElementById('auth-close-btn');
+
             const adminLoginModal = document.getElementById('admin-login-modal');
             const adminPanelModal = document.getElementById('admin-panel-modal');
             const viewQuoteModal = document.getElementById('view-quote-modal');
@@ -323,6 +421,7 @@
             const pdfPreviewCloseBtn = document.getElementById('pdf-preview-close-btn');
             const pdfCaptureBtn = document.getElementById('pdf-capture-btn');
 
+            let isRegisterMode = false;
 
             const switchPage = (pageId) => {
                 if (!pageId) return;
@@ -340,7 +439,6 @@
             const addPvcRow = () => {
                 const container = document.getElementById('pvc-rows-container');
                 pvcRowCount++;
-                // Removed the 10-item limit check
                 const rowId = `pvc-row-${pvcRowCount}`;
                 const rowHtml = `<div id="${rowId}" class="calculation-row grid grid-cols-12 gap-2 items-center"><span class="col-span-1 text-center text-slate-500">${pvcRowCount}.</span><input type="number" step="any" placeholder="กว้าง (ซม.)" class="w-full p-2 border rounded-md col-span-3"><input type="number" step="any" placeholder="สูง (ซม.)" class="w-full p-2 border rounded-md col-span-3"><input type="number" value="1" placeholder="จำนวน" class="w-full p-2 border rounded-md col-span-3"><button data-row-id="${rowId}" class="remove-row-btn col-span-2 text-red-500 hover:text-red-700 font-bold">ลบ</button></div>`;
                 container.insertAdjacentHTML('beforeend', rowHtml);
@@ -356,7 +454,6 @@
             const addWoodRow = () => {
                 const container = document.getElementById('wood-rows-container');
                 let rowCounter = container.querySelectorAll('.calculation-row').length;
-                // Removed the 10-item limit check
                 rowCounter++;
                 const rowId = `wood-row-${rowCounter}`;
                 const rowHtml = `
@@ -387,7 +484,6 @@
             const addRollerRow = () => {
                 const container = document.getElementById('roller-rows-container');
                 let rowCounter = container.querySelectorAll('.calculation-row').length;
-                // Removed the 10-item limit check
                 rowCounter++;
                 const rowId = `roller-row-${rowCounter}`;
                 const rowHtml = `
@@ -418,7 +514,6 @@
             const addRailRow = () => {
                 const container = document.getElementById('rail-rows-container');
                 let currentRowCount = container.querySelectorAll('.calculation-row').length;
-                // Removed the 10-item limit check
                 currentRowCount++;
                 const rowHtml = `
                     <div class="calculation-row p-4 border rounded-lg space-y-3 bg-slate-50">
@@ -1010,10 +1105,19 @@
             };
 
             const updateUIWithConfig = () => {
-                const visibility = appConfig.pageVisibility || { blinds: true, pvc: true, wood: true, rail: true, roller: true, settings: true }; // Add settings visibility
+                // Define role-based page visibility
+                const rolePageVisibility = {
+                    'admin': { blinds: true, pvc: true, wood: true, rail: true, roller: true, settings: true },
+                    'user': { blinds: true, pvc: true, wood: true, rail: true, roller: true, settings: false }, // Example: regular users can't see settings
+                    'anonymous': { blinds: true, pvc: true, wood: true, rail: true, roller: true, settings: false } // Anonymous users can't see settings
+                };
+
+                // Get the effective visibility based on current user's role
+                const effectiveVisibility = rolePageVisibility[userRole] || rolePageVisibility['anonymous'];
+
                 let firstVisiblePage = null;
-                Object.keys(visibility).forEach(pageKey => {
-                    const isVisible = visibility[pageKey];
+                Object.keys(pageElements).forEach(pageKey => { // Iterate through all page keys
+                    const isVisible = effectiveVisibility[pageKey] !== false; // Check effective visibility
                     if (tabElements[pageKey]) {
                         tabElements[pageKey].style.display = isVisible ? 'block' : 'none';
                     }
@@ -1021,9 +1125,10 @@
                         firstVisiblePage = `page-${pageKey}`;
                     }
                 });
+
                 if (!initialPageSet) {
                     const requestedStartPage = 'page-blinds';
-                    const isBlindsVisible = visibility.blinds !== false;
+                    const isBlindsVisible = effectiveVisibility.blinds !== false;
                     if (isBlindsVisible) {
                         switchPage(requestedStartPage);
                     } else {
@@ -1049,24 +1154,27 @@
                 }
                 populateRollerDropdowns();
 
-                // Populate settings fields
-                const settings = appConfig.settings || {};
-                document.getElementById('companyName').value = settings.company?.name || '';
-                document.getElementById('companyAddress').value = settings.company?.address || '';
-                document.getElementById('companyPhone').value = settings.company?.phone || '';
-                document.getElementById('companyEmail').value = settings.company?.email || '';
-                document.getElementById('defaultCustomerName').value = settings.defaultCustomer?.name || '';
-                document.getElementById('defaultCustomerAddress').value = settings.defaultCustomer?.address || '';
-                document.getElementById('defaultCustomerTaxId').value = settings.defaultCustomer?.taxId || '';
-                document.getElementById('bankName').value = settings.bank?.name || '';
-                document.getElementById('accountName').value = settings.bank?.accountName || '';
-                document.getElementById('accountNumber').value = settings.bank?.accountNumber || '';
-
+                // Populate settings fields (only if settings page is visible)
+                if (effectiveVisibility.settings) {
+                    const settings = appConfig.settings || {};
+                    document.getElementById('companyName').value = settings.company?.name || '';
+                    document.getElementById('companyAddress').value = settings.company?.address || '';
+                    document.getElementById('companyPhone').value = settings.company?.phone || '';
+                    document.getElementById('companyEmail').value = settings.company?.email || '';
+                    document.getElementById('defaultCustomerName').value = settings.defaultCustomer?.name || '';
+                    document.getElementById('defaultCustomerAddress').value = settings.defaultCustomer?.address || '';
+                    document.getElementById('defaultCustomerTaxId').value = settings.defaultCustomer?.taxId || '';
+                    document.getElementById('bankName').value = settings.bank?.name || '';
+                    document.getElementById('accountName').value = settings.bank?.accountName || '';
+                    document.getElementById('accountNumber').value = settings.bank?.accountNumber || '';
+                }
+                // Show/hide admin-specific controls
+                document.getElementById('admin-login-btn').style.display = isAdmin ? 'block' : 'none';
             };
 
             const initializeAppConfig = async () => {
                 const defaultConfig = {
-                    pageVisibility: { blinds: true, pvc: true, wood: true, rail: true, roller: true, settings: true }, // Add settings visibility
+                    pageVisibility: { blinds: true, pvc: true, wood: true, rail: true, roller: true, settings: true }, 
                     prices: {
                         pvc: [ { text: "320 - ฉากทึบ 10CM", value: 320 }, { text: "349 - ฉากทึบ 8.5CM", value: 349 }, { text: "799 - ฉากญี่ปุ่น", value: 799 }, { text: "899 - ฉากยูโร LA", value: 899 }, { text: "999 - ฉากยูโร LB", value: 999 } ],
                         wood: [ { text: "799 - ไม้โฟมวูด", value: 799 }, { text: "820 - ไม้บาสวูด", value: 820 } ],
@@ -1088,25 +1196,32 @@
                           }
                         }
                     },
-                    settings: { // Default settings structure
+                    settings: { 
                         company: { name: '', address: '', phone: '', email: '' },
                         defaultCustomer: { name: '', address: '', taxId: '' },
                         bank: { name: '', accountName: '', accountNumber: '' }
+                    },
+                    // Define role-based permissions (default values)
+                    userRoles: {
+                        'admin': { allowedPages: ['blinds', 'pvc', 'wood', 'rail', 'roller', 'settings'], canManageUsers: true, canEditPrices: true },
+                        'user': { allowedPages: ['blinds', 'pvc', 'wood', 'rail', 'roller'], canManageUsers: false, canEditPrices: false },
+                        'anonymous': { allowedPages: ['blinds', 'pvc', 'wood', 'rail', 'roller'], canManageUsers: false, canEditPrices: false }
                     }
                 };
                 appConfig = defaultConfig;
-                updateUIWithConfig();
                 const configRef = doc(db, `artifacts/${appId}/public/data/config/main`);
                 onSnapshot(configRef, (docSnap) => {
                     if (docSnap.exists()) {
                         appConfig = docSnap.data();
-                         if (!appConfig.prices) { appConfig.prices = {}; }
+                         // Ensure all default structures exist after fetching
+                         if (!appConfig.prices) { appConfig.prices = defaultConfig.prices; }
                          if (!appConfig.prices.rail) { appConfig.prices.rail = defaultConfig.prices.rail; }
                          if (!appConfig.prices.roller) { appConfig.prices.roller = defaultConfig.prices.roller; }
-                         if (!appConfig.pageVisibility) { appConfig.pageVisibility = defaultConfig.pageVisibility; }
+                         if (!appConfig.pageVisibility) { appConfig.pageVisibility = defaultConfig.pageVisibility; } // This is now overridden by userRoles
                          if (appConfig.pageVisibility.roller === undefined) { appConfig.pageVisibility.roller = defaultConfig.pageVisibility.roller; }
-                         if (appConfig.pageVisibility.settings === undefined) { appConfig.pageVisibility.settings = defaultConfig.pageVisibility.settings; } // Ensure settings visibility is set
-                         if (!appConfig.settings) { appConfig.settings = defaultConfig.settings; } // Ensure settings are initialized
+                         if (appConfig.pageVisibility.settings === undefined) { appConfig.pageVisibility.settings = defaultConfig.pageVisibility.settings; }
+                         if (!appConfig.settings) { appConfig.settings = defaultConfig.settings; }
+                         if (!appConfig.userRoles) { appConfig.userRoles = defaultConfig.userRoles; } // Initialize userRoles
                         updateUIWithConfig();
                     } else {
                         setDoc(configRef, defaultConfig);
@@ -1145,8 +1260,18 @@
             };
 
             const saveAdminChanges = async () => {
+                // This function now saves global price and visibility settings
+                // User management will be handled separately (or requires more complex UI here)
                 const newConfig = JSON.parse(JSON.stringify(appConfig));
-                document.querySelectorAll('#visibility-controls input').forEach(input => { newConfig.pageVisibility[input.dataset.page] = input.checked; });
+                
+                // Update page visibility based on admin panel (this will update global defaults)
+                document.querySelectorAll('#visibility-controls input').forEach(input => { 
+                    const pageKey = input.dataset.page;
+                    // This part needs careful consideration for role-based visibility.
+                    // For now, it updates the global pageVisibility, which is less precise for per-user control.
+                    // A proper implementation would allow admin to modify `appConfig.userRoles` directly.
+                    newConfig.pageVisibility[pageKey] = input.checked; 
+                });
                 
                 const newPvcPrices = [];
                 document.querySelectorAll('#pvc-price-controls .price-item').forEach(item => {
@@ -1190,7 +1315,7 @@
                 alert('บันทึกการเปลี่ยนแปลงแล้ว'); adminPanelModal.style.display = 'none';
             };
 
-            // New function to save settings
+            // Function to save general settings (company, customer, bank)
             const saveSettings = async () => {
                 const newSettings = {
                     company: {
@@ -1213,13 +1338,11 @@
 
                 try {
                     const configRef = doc(db, `artifacts/${appId}/public/data/config/main`);
-                    // Fetch current config to merge settings, or create if not exists
                     const docSnap = await getDoc(configRef);
                     let currentConfig = {};
                     if (docSnap.exists()) {
                         currentConfig = docSnap.data();
                     }
-                    // Merge new settings into current config
                     const updatedConfig = { ...currentConfig, settings: newSettings };
                     await setDoc(configRef, updatedConfig);
                     alert('บันทึกการตั้งค่าสำเร็จ!');
@@ -1242,13 +1365,18 @@
                 return item;
             };
 
-            const openAdminPanel = () => {
-                if(!isLoggedIn) return;
+            const openAdminPanel = async () => {
+                if(!isAdmin) { alert('คุณไม่มีสิทธิ์เข้าถึงแผงควบคุมผู้ดูแล'); return; } // Only admin can access
+                
                 const visibility = appConfig.pageVisibility || {};
                 const prices = appConfig.prices || { pvc: [], wood: [], rail: {}, roller: {} };
                 
                 const visContainer = document.getElementById('visibility-controls');
-                visContainer.innerHTML = Object.keys(tabElements).map(key => `<label class="flex items-center"><input type="checkbox" data-page="${key}" ${visibility[key] !== false ? 'checked' : ''} class="mr-2 h-4 w-4">${tabElements[key].textContent}</label>`).join('');
+                // This section now reflects the global page visibility settings (which admins can modify)
+                visContainer.innerHTML = Object.keys(pageElements).map(key => {
+                    const isChecked = appConfig.pageVisibility[key] !== false; // Use appConfig.pageVisibility for global control
+                    return `<label class="flex items-center"><input type="checkbox" data-page="${key}" ${isChecked ? 'checked' : ''} class="mr-2 h-4 w-4">${tabElements[key].textContent}</label>`;
+                }).join('');
                 
                 const pvcContainer = document.getElementById('pvc-price-controls');
                 pvcContainer.innerHTML = '';
@@ -1282,6 +1410,54 @@
                     rollerContainer.insertBefore(newCat, addCategoryBtn);
                 };
                 rollerContainer.appendChild(addCategoryBtn);
+
+                // Populate User Management Section (Placeholder for now)
+                const userListContainer = document.getElementById('user-list');
+                userListContainer.innerHTML = '<li>กำลังโหลดผู้ใช้...</li>';
+                try {
+                    const usersCollectionRef = collection(db, `artifacts/${appId}/users`);
+                    const userQuerySnapshot = await getDocs(usersCollectionRef);
+                    userListContainer.innerHTML = ''; // Clear loading message
+                    if (userQuerySnapshot.empty) {
+                        userListContainer.innerHTML = '<li class="text-slate-500">ยังไม่มีผู้ใช้ในระบบ</li>';
+                    } else {
+                        userQuerySnapshot.forEach(userDoc => {
+                            const userData = userDoc.data();
+                            const userEmail = userData.email || 'N/A';
+                            const userRole = userData.role || 'user';
+                            const userId = userDoc.id;
+                            const userLi = document.createElement('li');
+                            userLi.className = 'flex justify-between items-center p-2 bg-slate-100 rounded';
+                            userLi.innerHTML = `
+                                <span>${userEmail} (Role: ${userRole})</span>
+                                <button data-uid="${userId}" data-current-role="${userRole}" class="edit-user-role-btn text-blue-500 hover:text-blue-700 px-2 py-1 rounded">แก้ไขบทบาท</button>
+                            `;
+                            userListContainer.appendChild(userLi);
+                        });
+                        userListContainer.querySelectorAll('.edit-user-role-btn').forEach(btn => {
+                            btn.addEventListener('click', async (e) => {
+                                const uid = e.target.dataset.uid;
+                                const currentRole = e.target.dataset.currentRole;
+                                const newRole = prompt(`เปลี่ยนบทบาทสำหรับผู้ใช้ ${uid} จาก ${currentRole} เป็น (admin/user):`);
+                                if (newRole && (newRole === 'admin' || newRole === 'user')) {
+                                    try {
+                                        await setDoc(doc(db, `artifacts/${appId}/users/${uid}`), { role: newRole }, { merge: true });
+                                        alert('เปลี่ยนบทบาทสำเร็จ!');
+                                        openAdminPanel(); // Refresh admin panel
+                                    } catch (error) {
+                                        console.error("Error updating user role:", error);
+                                        alert('เกิดข้อผิดพลาดในการเปลี่ยนบทบาท: ' + error.message);
+                                    }
+                                } else if (newRole !== null) {
+                                    alert('บทบาทไม่ถูกต้อง! ต้องเป็น "admin" หรือ "user"');
+                                }
+                            });
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error fetching users:", error);
+                    userListContainer.innerHTML = '<li class="text-red-500">เกิดข้อผิดพลาดในการโหลดผู้ใช้</li>';
+                }
 
                 adminPanelModal.style.display = 'flex';
             };
@@ -1340,9 +1516,15 @@
             // --- END: Admin Panel Dynamic Functions ---
 
             const saveQuotation = async (type, data, title) => {
+                if (!isLoggedIn) {
+                    alert('กรุณาเข้าสู่ระบบเพื่อบันทึกใบเสนอราคา');
+                    return;
+                }
                 try { 
                     await addDoc(collection(db, `artifacts/${appId}/public/data/quotations`), { 
-                        type, data, title, createdAt: serverTimestamp()
+                        type, data, title, createdAt: serverTimestamp(),
+                        userId: currentUser.uid, // Save the UID of the user who saved it
+                        userEmail: currentUser.email || 'anonymous'
                     }); 
                     alert('บันทึกใบเสนอราคาสำเร็จ!'); 
                 } 
@@ -1354,16 +1536,31 @@
             
             const deleteQuotation = async (event) => {
                 const id = event.target.dataset.id;
-                // Custom modal confirmation would be better, but window.confirm is used for simplicity here.
-                const userConfirmed = window.confirm(`คุณต้องการลบใบเสนอราคานี้ใช่หรือไม่?`);
-                if (userConfirmed) {
-                    try { 
-                        await deleteDoc(doc(db, `artifacts/${appId}/public/data/quotations`, id)); 
-                    } 
-                    catch (e) { 
-                        console.error("Error deleting document: ", e); 
-                        alert('เกิดข้อผิดพลาดในการลบ: ' + e.message);
+                if (!isLoggedIn) {
+                    alert('กรุณาเข้าสู่ระบบเพื่อลบใบเสนอราคา');
+                    return;
+                }
+                // Check if current user is admin OR the owner of the quotation
+                const quoteDocRef = doc(db, `artifacts/${appId}/public/data/quotations`, id);
+                const quoteDocSnap = await getDoc(quoteDocRef);
+                if (quoteDocSnap.exists()) {
+                    const quoteData = quoteDocSnap.data();
+                    if (isAdmin || (currentUser && quoteData.userId === currentUser.uid)) {
+                        const userConfirmed = confirm(`คุณต้องการลบใบเสนอราคานี้ใช่หรือไม่?`);
+                        if (userConfirmed) {
+                            try { 
+                                await deleteDoc(doc(db, `artifacts/${appId}/public/data/quotations`, id)); 
+                            } 
+                            catch (e) { 
+                                console.error("Error deleting document: ", e); 
+                                alert('เกิดข้อผิดพลาดในการลบ: ' + e.message);
+                            }
+                        }
+                    } else {
+                        alert('คุณไม่มีสิทธิ์ลบใบเสนอราคานี้');
                     }
+                } else {
+                    alert('ไม่พบใบเสนอราคาที่ต้องการลบ');
                 }
             };
             
@@ -1476,13 +1673,111 @@
             // --- BIND EVENT LISTENERS ---
             Object.values(tabElements).forEach(tab => tab.addEventListener('click', () => switchPage(tab.dataset.page)));
             
-            document.getElementById('admin-login-btn').addEventListener('click', () => { adminLoginModal.style.display = 'flex'; });
+            // Auth button click
+            document.getElementById('auth-btn').addEventListener('click', () => {
+                isRegisterMode = false;
+                authModalTitle.textContent = 'เข้าสู่ระบบ';
+                authSubmitBtn.textContent = 'เข้าสู่ระบบ';
+                toggleAuthModeBtn.textContent = 'ยังไม่มีบัญชี? สมัครสมาชิก';
+                authErrorDisplay.textContent = '';
+                authEmailInput.value = '';
+                authPasswordInput.value = '';
+                authModal.style.display = 'flex';
+            });
+
+            // Toggle between Login and Register
+            toggleAuthModeBtn.addEventListener('click', () => {
+                isRegisterMode = !isRegisterMode;
+                authModalTitle.textContent = isRegisterMode ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ';
+                authSubmitBtn.textContent = isRegisterMode ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ';
+                toggleAuthModeBtn.textContent = isRegisterMode ? 'มีบัญชีอยู่แล้ว? เข้าสู่ระบบ' : 'ยังไม่มีบัญชี? สมัครสมาชิก';
+                authErrorDisplay.textContent = '';
+            });
+
+            // Auth submit (Login/Register)
+            authSubmitBtn.addEventListener('click', async () => {
+                const email = authEmailInput.value;
+                const password = authPasswordInput.value;
+                authErrorDisplay.textContent = ''; // Clear previous errors
+
+                if (!email || !password) {
+                    authErrorDisplay.textContent = 'กรุณากรอกอีเมลและรหัสผ่าน';
+                    return;
+                }
+
+                try {
+                    if (isRegisterMode) {
+                        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                        // Create user document in Firestore with default role 'user'
+                        await setDoc(doc(db, `artifacts/${appId}/users/${userCredential.user.uid}`), {
+                            email: userCredential.user.email,
+                            role: 'user',
+                            createdAt: serverTimestamp()
+                        });
+                        alert('สมัครสมาชิกสำเร็จ! คุณได้เข้าสู่ระบบแล้ว');
+                    } else {
+                        await signInWithEmailAndPassword(auth, email, password);
+                        alert('เข้าสู่ระบบสำเร็จ!');
+                    }
+                    authModal.style.display = 'none'; // Close modal on success
+                } catch (error) {
+                    console.error("Auth error:", error);
+                    let errorMessage = 'เกิดข้อผิดพลาด';
+                    switch (error.code) {
+                        case 'auth/email-already-in-use':
+                            errorMessage = 'อีเมลนี้ถูกใช้แล้ว';
+                            break;
+                        case 'auth/invalid-email':
+                            errorMessage = 'รูปแบบอีเมลไม่ถูกต้อง';
+                            break;
+                        case 'auth/weak-password':
+                            errorMessage = 'รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร';
+                            break;
+                        case 'auth/user-not-found':
+                        case 'auth/wrong-password':
+                            errorMessage = 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
+                            break;
+                        default:
+                            errorMessage = 'เกิดข้อผิดพลาดในการยืนยันตัวตน: ' + error.message;
+                    }
+                    authErrorDisplay.textContent = errorMessage;
+                }
+            });
+
+            // Logout button
+            document.getElementById('logout-btn').addEventListener('click', async () => {
+                try {
+                    await signOut(auth);
+                    alert('ออกจากระบบสำเร็จ!');
+                    // After logout, Firebase automatically signs in anonymously.
+                    // The onAuthStateChanged listener will handle UI updates.
+                } catch (error) {
+                    console.error("Logout error:", error);
+                    alert('เกิดข้อผิดพลาดในการออกจากระบบ: ' + error.message);
+                }
+            });
+
+            authCloseBtn.addEventListener('click', () => { authModal.style.display = 'none'; });
+            
+            // Original admin login (now only for admin role users)
+            document.getElementById('admin-login-btn').addEventListener('click', () => { 
+                if (isAdmin) { // Only allow if already recognized as admin by Firebase Auth
+                    adminLoginModal.style.display = 'flex'; 
+                } else {
+                    alert('คุณไม่มีสิทธิ์เข้าถึงแผงควบคุมผู้ดูแล');
+                }
+            });
             document.getElementById('login-close-btn').addEventListener('click', () => { adminLoginModal.style.display = 'none'; });
             document.getElementById('admin-panel-close-btn').addEventListener('click', () => { adminPanelModal.style.display = 'none'; });
             document.getElementById('view-quote-close-btn').addEventListener('click', () => { viewQuoteModal.style.display = 'none'; });
+            
+            // Original admin login logic (can be removed if Firebase Auth is primary admin login)
             document.getElementById('login-submit-btn').addEventListener('click', () => {
                 if (document.getElementById('username').value === 'admin' && document.getElementById('password').value === '1988') {
-                    isLoggedIn = true; adminLoginModal.style.display = 'none'; openAdminPanel();
+                    // This is a static, client-side admin check. For a real system, admin role should be checked via Firebase Auth.
+                    // For now, it opens the admin panel.
+                    adminLoginModal.style.display = 'none'; 
+                    openAdminPanel();
                 } else { document.getElementById('login-error').textContent = 'Username หรือ Password ไม่ถูกต้อง'; }
             });
             document.getElementById('admin-save-btn').addEventListener('click', saveAdminChanges);
