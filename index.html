@@ -219,7 +219,10 @@
     </div>
     
     <script>
-        var Sarabun_Regular_normal = 'AAEAAAARAQAABAAQR0RFRg... (The full Base64 encoded font data from your GitHub is now embedded here)';
+        // โปรดวางข้อมูลฟอนต์ Sarabun-Regular Base64 ที่สมบูรณ์ของคุณที่นี่
+        // ตัวอย่าง: var Sarabun_Regular_normal = 'AAEAAAARAQAABAAQR0RFRg... (ข้อมูลฟอนต์ที่สมบูรณ์)';
+        // หากข้อมูลนี้ไม่สมบูรณ์หรือไม่ถูกต้อง การสร้าง PDF จะล้มเหลวหรือแสดงผลภาษาไทยไม่ได้
+        var Sarabun_Regular_normal = 'AAEAAAARAQAABAAQR0RFRg... (The full Base64 encoded font data from your GitHub is now embedded here)'; // กรุณาแทนที่ด้วยข้อมูลฟอนต์ Base64 ที่สมบูรณ์
     </script>
     
     <script type="module">
@@ -474,6 +477,12 @@
                 try {
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF();
+
+                    // ตรวจสอบว่าข้อมูลฟอนต์ Sarabun_Regular_normal มีอยู่และไม่ว่างเปล่า
+                    if (!window.Sarabun_Regular_normal || window.Sarabun_Regular_normal.length < 100) { // ตรวจสอบความยาวขั้นต่ำเพื่อยืนยันว่าข้อมูลสมบูรณ์
+                        throw new Error("ข้อมูลฟอนต์ Sarabun_Regular_normal ไม่สมบูรณ์หรือไม่พบ กรุณาตรวจสอบการฝังฟอนต์ในโค้ด");
+                    }
+
                     doc.addFileToVFS("Sarabun-Regular-normal.ttf", window.Sarabun_Regular_normal);
                     doc.addFont("Sarabun-Regular-normal.ttf", "Sarabun-Regular", "normal");
                     doc.setFont("Sarabun-Regular", "normal");
@@ -506,7 +515,8 @@
                     doc.save(filename);
                 } catch (e) {
                     console.error("PDF Generation Error: ", e);
-                    alert("เกิดข้อผิดพลาดในการสร้างไฟล์ PDF: " + e.message);
+                    // ใช้ alert แทน window.alert เพื่อให้สอดคล้องกับคำแนะนำ
+                    alert("เกิดข้อผิดพลาดในการสร้างไฟล์ PDF: " + e.message + "\n\nโปรดตรวจสอบว่าข้อมูลฟอนต์ Sarabun-Regular Base64 ถูกต้องและสมบูรณ์");
                 }
             };
             
