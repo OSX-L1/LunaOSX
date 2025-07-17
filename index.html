@@ -252,20 +252,65 @@
     </div>
 
     <div id="admin-login-modal" class="modal-overlay">
-        <div class="modal-box w-full max-w-sm"><h2 class="text-2xl font-bold text-center mb-6">ผู้ดูแลระบบ (สำหรับ Admin Login เดิม)</h2><div class="space-y-4"><div><label for="username">Username</label><input id="username" type="text" class="w-full p-3 border rounded-md"></div><div><label for="password">Password</label><input id="password" type="password" class="w-full p-3 border rounded-md"></div><p id="login-error" class="text-red-500 text-sm text-center"></p><button id="login-submit-btn" class="btn btn-primary w-full text-white py-3 rounded-md font-bold">เข้าสู่ระบบ</button><button id="login-close-btn" class="w-full text-slate-500 py-2 mt-2">ปิด</button></div></div>
+        <div class="modal-box w-full max-w-sm"><h2 class="text-2xl font-bold text-center mb-6">ผู้ดูแลระบบ (สำหรับ Admin Login เดิม)</h2><div class="space-y-4"><div><label for="username">Username</label><input type="text" id="username" class="w-full p-3 border rounded-md"></div><div><label for="password">Password</label><input type="password" id="password" class="w-full p-3 border rounded-md"></div><p id="login-error" class="text-red-500 text-sm text-center"></p><button id="login-submit-btn" class="btn btn-primary w-full text-white py-3 rounded-md font-bold">เข้าสู่ระบบ</button><button id="login-close-btn" class="w-full text-slate-500 py-2 mt-2">ปิด</button></div></div>
     </div>
     <div id="admin-panel-modal" class="modal-overlay items-start justify-center py-10 overflow-y-auto">
         <div class="modal-box w-full max-w-4xl"><div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold">แผงควบคุมผู้ดูแล</h2><button id="admin-panel-close-btn" class="text-2xl">&times;</button></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">การแสดงผลหน้าเว็บ</h3><div id="visibility-controls" class="space-y-2"></div></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการราคาฉากกั้นแอร์</h3><div id="pvc-price-controls" class="space-y-2"></div><button id="add-pvc-price-btn" class="mt-2 text-sm bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">+ เพิ่มราคา</button></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการราคามู่ลี่ไม้</h3><div id="wood-price-controls" class="space-y-2"></div><button id="add-wood-price-btn" class="mt-2 text-sm bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">+ เพิ่มราคา</button></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการราคารางม่าน</h3><div id="rail-price-controls" class="space-y-2"></div></div><div class="mb-6"><h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการราคาม่านม้วน</h3><div id="roller-price-controls" class="space-y-4"></div></div>
-            <!-- New: User Management Section Placeholder -->
+            <!-- User Management Section -->
             <div class="mb-6">
                 <h3 class="text-lg font-bold border-b pb-2 mb-3">จัดการผู้ใช้</h3>
                 <div id="user-management-controls" class="space-y-2">
-                    <p class="text-slate-500">ส่วนนี้จะแสดงรายการผู้ใช้และให้ผู้ดูแลสามารถแก้ไขบทบาทหรือสิทธิ์ได้ (ต้องพัฒนาเพิ่มเติม)</p>
                     <ul id="user-list" class="space-y-2"></ul>
                 </div>
             </div>
             <button id="admin-save-btn" class="btn btn-secondary w-full text-white py-3 rounded-md font-bold mb-8">บันทึกการเปลี่ยนแปลง</button><div><h3 class="text-lg font-bold border-b pb-2 mb-3">ใบเสนอราคาที่บันทึกไว้</h3><div id="saved-quotations-list" class="space-y-2 max-h-64 overflow-y-auto"></div></div></div>
     </div>
+
+    <!-- User Edit Modal (New) -->
+    <div id="user-edit-modal" class="modal-overlay items-start justify-center py-10 overflow-y-auto">
+        <div class="modal-box w-full max-w-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">แก้ไขข้อมูลผู้ใช้: <span id="edit-user-email"></span></h2>
+                <button id="user-edit-close-btn" class="text-2xl">&times;</button>
+            </div>
+            <div class="space-y-4">
+                <input type="hidden" id="edit-user-uid">
+                <div>
+                    <label for="edit-user-role" class="block font-medium text-slate-700 mb-1">บทบาท (Role)</label>
+                    <select id="edit-user-role" class="w-full px-4 py-3 bg-slate-50 border rounded-lg">
+                        <option value="user">ผู้ใช้ทั่วไป (user)</option>
+                        <option value="admin">ผู้ดูแลระบบ (admin)</option>
+                    </select>
+                </div>
+                
+                <div class="bg-slate-50 p-4 rounded-lg">
+                    <h3 class="text-lg font-bold mb-3">สิทธิ์การมองเห็นหน้าเว็บ (Allowed Pages)</h3>
+                    <p class="text-sm text-slate-600 mb-2">เลือกหน้าที่ผู้ใช้คนนี้ได้รับอนุญาตให้เห็นและใช้งานได้ (จะ Override การตั้งค่าตามบทบาท)</p>
+                    <div id="edit-user-allowed-pages" class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        <!-- Checkboxes will be populated here -->
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-lg">
+                    <h3 class="text-lg font-bold mb-3">ราคาคำนวณเฉพาะ (Custom Prices)</h3>
+                    <p class="text-sm text-slate-600 mb-2">
+                        กำหนดราคาคำนวณเฉพาะสำหรับผู้ใช้คนนี้ในรูปแบบ JSON (หากกำหนดไว้จะใช้ราคานี้แทนราคา Global)
+                        <br>
+                        **โครงสร้างราคา:**
+                        <ul class="list-disc list-inside ml-4 text-xs text-slate-500">
+                            <li>**"pvc" / "wood"**: กำหนดราคาต่อหน่วยเป็นตัวเลขตรงๆ เช่น `"pvc": 355`</li>
+                            <li>**"rail"**: กำหนดราคาตามประเภทรางและระบบ (wave_manual, m_cord, roman) เช่น `"rail": { "wave_manual": 230, "roman": 190 }`</li>
+                            <li>**"roller"**: กำหนดราคาตามประเภทหลัก (Category) และรุ่นสินค้า (Type) เช่น `"roller": { "Sunscreen": { "LUMI 5%": { "price": 290 } } }`</li>
+                        </ul>
+                    </p>
+                    <textarea id="edit-user-custom-prices" class="w-full p-2 border rounded-lg font-mono text-sm" rows="12" placeholder='ตัวอย่าง:&#10;{&#10;  "pvc": 355,&#10;  "wood": 850,&#10;  "rail": {&#10;    "wave_manual": 230,&#10;    "m_cord": 170,&#10;    "roman": 190&#10;  },&#10;  "roller": {&#10;    "Sunscreen": {&#10;      "LUMI 5%": { "price": 290 }&#10;    },&#10;    "Blackout 100%": {&#10;      "KOALA NOVA": { "price": 295 }&#10;    }&#10;  }&#10;}'></textarea>
+                </div>
+
+                <button id="save-user-changes-btn" class="btn btn-primary w-full text-white font-bold py-3 rounded-lg">บันทึกการเปลี่ยนแปลงผู้ใช้</button>
+            </div>
+        </div>
+    </div>
+
     <div id="view-quote-modal" class="modal-overlay items-start justify-center py-10 overflow-y-auto">
         <div class="modal-box w-full max-w-xl"><div class="flex justify-between items-center mb-4"><h2 id="view-quote-title" class="text-xl font-bold">รายละเอียดใบเสนอราคา</h2><button id="view-quote-close-btn" class="text-2xl">&times;</button></div><div id="view-quote-content" class="text-sm"></div></div>
     </div>
@@ -323,6 +368,7 @@
         let isAdmin = false;
         let userRole = 'anonymous'; // Default role
         let userPermissions = {}; // Permissions based on user's role
+        let userCustomPrices = {}; // User-specific custom prices
 
         document.addEventListener('DOMContentLoaded', async () => {
 
@@ -342,24 +388,35 @@
                     userDisplay.classList.remove('hidden');
                     userDisplay.textContent = `ผู้ใช้: ${user.email || 'ไม่ระบุอีเมล'} (UID: ${user.uid.substring(0, 6)}...)`;
 
-                    // Fetch user role from Firestore
+                    // Fetch user role, allowedPages, and customPrices from Firestore
                     const userDocRef = doc(db, `artifacts/${appId}/users/${user.uid}`);
                     const userDocSnap = await getDoc(userDocRef);
 
                     if (userDocSnap.exists()) {
-                        userRole = userDocSnap.data().role || 'user';
+                        const userData = userDocSnap.data();
+                        userRole = userData.role || 'user';
+                        // Convert allowedPages array to an object for easier lookup
+                        userPermissions = (userData.allowedPages || []).reduce((acc, pageKey) => {
+                            acc[pageKey] = true;
+                            return acc;
+                        }, {});
+                        userCustomPrices = userData.customPrices || {}; // Store custom prices
                     } else {
                         // If user document doesn't exist, create it with default 'user' role
-                        // This might happen if user was created directly in Firebase Auth console
-                        // or if security rules prevented initial write.
                         try {
-                            await setDoc(userDocRef, { email: user.email, role: 'user', createdAt: serverTimestamp() }, { merge: true });
+                            await setDoc(userDocRef, { 
+                                email: user.email, 
+                                role: 'user', 
+                                createdAt: serverTimestamp(),
+                                allowedPages: [], // Default empty, will inherit from role
+                                customPrices: {} // Default empty
+                            }, { merge: true });
                             userRole = 'user';
+                            userPermissions = {};
+                            userCustomPrices = {};
                             console.log(`Created user document for ${user.email} with role 'user'.`);
                         } catch (error) {
                             console.error("Error creating user document in Firestore:", error);
-                            // If this fails, it's likely a security rule issue preventing the write
-                            // User might still be logged in, but their role won't be set correctly.
                         }
                     }
                     isAdmin = (userRole === 'admin');
@@ -375,6 +432,8 @@
                     adminLoginBtn.classList.add('hidden');
                     userRole = 'anonymous';
                     isAdmin = false;
+                    userPermissions = {};
+                    userCustomPrices = {};
                 }
                 // Re-initialize app config to apply new permissions based on role
                 initializeAppConfig(); 
@@ -423,6 +482,16 @@
 
             const adminLoginModal = document.getElementById('admin-login-modal');
             const adminPanelModal = document.getElementById('admin-panel-modal');
+            const userEditModal = document.getElementById('user-edit-modal'); // New user edit modal
+            const editUserEmailSpan = document.getElementById('edit-user-email');
+            const editUserUidInput = document.getElementById('edit-user-uid');
+            const editUserRoleSelect = document.getElementById('edit-user-role');
+            const editUserAllowedPagesDiv = document.getElementById('edit-user-allowed-pages');
+            const editUserCustomPricesTextarea = document.getElementById('edit-user-custom-prices');
+            const saveUserChangesBtn = document.getElementById('save-user-changes-btn');
+            const userEditCloseBtn = document.getElementById('user-edit-close-btn');
+
+
             const viewQuoteModal = document.getElementById('view-quote-modal');
             const pdfPreviewModal = document.getElementById('pdf-preview-modal');
             const pdfPreviewContent = document.getElementById('pdf-preview-content');
@@ -793,11 +862,21 @@
             
             const handlePvcCalculation = () => {
                 const priceSelect = document.getElementById('pvcPriceSelect');
-                const customPrice = document.getElementById('pvcCustomPrice');
+                const customPriceInput = document.getElementById('pvcCustomPrice');
                 const rowsContainer = document.getElementById('pvc-rows-container');
                 const errorDiv = document.getElementById('pvcErrorMessage');
 
-                errorDiv.textContent = ''; let price = parseFloat(customPrice.disabled ? priceSelect.value : customPrice.value);
+                errorDiv.textContent = ''; 
+                let price = parseFloat(customPriceInput.disabled ? priceSelect.value : customPriceInput.value);
+
+                // Check for user-specific custom price for PVC
+                if (userCustomPrices && userCustomPrices.pvc !== undefined && !isNaN(userCustomPrices.pvc)) {
+                    price = userCustomPrices.pvc;
+                    console.log("Using custom PVC price:", price);
+                } else {
+                    console.log("Using global PVC price:", price);
+                }
+
                 if(isNaN(price) || price <= 0) { errorDiv.textContent = 'กรุณาเลือกหรือกรอกราคาที่ถูกต้อง'; return null; }
                 const rows = rowsContainer.querySelectorAll('.calculation-row');
                 if (rows.length === 0) { errorDiv.textContent = 'กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ'; return null; }
@@ -828,11 +907,20 @@
             const handleWoodCalculation = () => {
                 const errorDiv = document.getElementById('woodErrorMessage');
                 const priceSelect = document.getElementById('woodPriceSelect');
-                const customPrice = document.getElementById('woodCustomPrice');
+                const customPriceInput = document.getElementById('woodCustomPrice');
                 const rowsContainer = document.getElementById('wood-rows-container');
                 
                 errorDiv.textContent = '';
-                let price = parseFloat(customPrice.disabled ? priceSelect.value : customPrice.value);
+                let price = parseFloat(customPriceInput.disabled ? priceSelect.value : customPriceInput.value);
+
+                // Check for user-specific custom price for Wood
+                if (userCustomPrices && userCustomPrices.wood !== undefined && !isNaN(userCustomPrices.wood)) {
+                    price = userCustomPrices.wood;
+                    console.log("Using custom Wood price:", price);
+                } else {
+                    console.log("Using global Wood price:", price);
+                }
+
                 if(isNaN(price) || price <= 0) {
                     errorDiv.textContent = 'กรุณาเลือกหรือกรอกราคาที่ถูกต้อง';
                     return;
@@ -912,6 +1000,7 @@
                 let itemsForPdf = [];
                 let allRowsValid = true;
                 const railPrices = appConfig.prices?.rail || {};
+
                 rows.forEach((row, index) => {
                     const railType = row.querySelector('.rail-type-select').value;
                     const system = row.querySelector('.rail-system-select').value;
@@ -929,20 +1018,33 @@
                     }
                     let basePrice = 0;
                     let description = "";
+
+                    // Check for user-specific custom price for Rail
+                    if (userCustomPrices && userCustomPrices.rail && userCustomPrices.rail[railType] && userCustomPrices.rail[railType][system] !== undefined && !isNaN(userCustomPrices.rail[railType][system])) {
+                        basePrice = userCustomPrices.rail[railType][system];
+                        console.log(`Using custom Rail price for ${railType}-${system}:`, basePrice);
+                    } else if (railPrices[railType] && railPrices[railType][system] !== undefined && !isNaN(railPrices[railType][system])) {
+                        basePrice = railPrices[railType][system];
+                        console.log(`Using global Rail price for ${railType}-${system}:`, basePrice);
+                    } else if (railPrices[railType] !== undefined && !isNaN(railPrices[railType])) { // For roman which doesn't have system
+                         basePrice = railPrices[railType];
+                         console.log(`Using global Rail price for ${railType}:`, basePrice);
+                    } else {
+                        console.warn(`Price not found for Rail type: ${railType}, system: ${system}`);
+                        allRowsValid = false; // Mark as invalid if price not found
+                    }
+
                     switch (railType) {
                         case 'wave':
                             description = "รางม่านลอนเทป";
-                            basePrice = system === 'manual' ? railPrices.wave_manual : railPrices.wave_cord;
                             description += system === 'manual' ? ' (มือเปิด)' : ' (เชือกดึง)';
                             break;
                         case 'm':
                             description = "รางเอ็ม (ม่านจีบ)";
-                            basePrice = system === 'manual' ? railPrices.m_manual : railPrices.m_cord;
                             description += system === 'manual' ? ' (มือเปิด)' : ' (เชือกดึง)';
                             break;
                         case 'roman':
                              description = "รางม่านพับ";
-                            basePrice = railPrices.roman;
                             break;
                     }
                     const widthM = widthCm / 100;
@@ -951,7 +1053,7 @@
                     itemsForPdf.push({ no: index + 1, description: description, width: widthCm, qty: qty, itemCost: itemCost });
                 });
                 if (!allRowsValid) {
-                    errorDiv.textContent = 'กรุณากรอกข้อมูลความกว้างและจำนวนให้ถูกต้องทุกรายการ';
+                    errorDiv.textContent = 'กรุณากรอกข้อมูลความกว้างและจำนวนให้ถูกต้องทุกรายการ หรือราคาสำหรับบางรายการไม่ถูกต้อง';
                     document.getElementById('railResult').classList.add('hidden');
                     document.getElementById('railPdfBtn').disabled = true;
                     document.getElementById('railSaveBtn').disabled = true;
@@ -971,8 +1073,21 @@
                 const rowsContainer = document.getElementById('roller-rows-container');
                 
                 errorDiv.textContent = '';
-                const priceText = priceDisplay.textContent.replace(/[^0-9.]/g, '');
-                const price = parseFloat(priceText);
+                const category = document.getElementById('rollerCategorySelect').value;
+                const type = document.getElementById('rollerTypeSelect').value;
+                const code = document.getElementById('rollerCodeSelect').value;
+
+                let price = 0;
+
+                // Check for user-specific custom price for Roller
+                if (userCustomPrices && userCustomPrices.roller && userCustomPrices.roller[category] && userCustomPrices.roller[category][type] && userCustomPrices.roller[category][type].price !== undefined && !isNaN(userCustomPrices.roller[category][type].price)) {
+                    price = userCustomPrices.roller[category][type].price;
+                    console.log("Using custom Roller price:", price);
+                } else {
+                    const priceText = priceDisplay.textContent.replace(/[^0-9.]/g, '');
+                    price = parseFloat(priceText);
+                    console.log("Using global Roller price:", price);
+                }
                 
                 if (isNaN(price) || price <= 0) {
                     errorDiv.textContent = 'กรุณาเลือกรุ่นสินค้าที่มีราคาถูกต้อง';
@@ -1021,10 +1136,6 @@
                     errorDiv.textContent = 'กรุณากรอกข้อมูลในทุกช่องให้ถูกต้อง';
                     return;
                 }
-                
-                const category = document.getElementById('rollerCategorySelect').value;
-                const type = document.getElementById('rollerTypeSelect').value;
-                const code = document.getElementById('rollerCodeSelect').value;
                 
                 document.getElementById('rollerTotalPrice').textContent = `฿${totalCost.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
                 document.getElementById('rollerResult').classList.remove('hidden');
@@ -1114,19 +1225,26 @@
             };
 
             const updateUIWithConfig = () => {
-                // Define role-based page visibility
+                // Define role-based page visibility (as a fallback)
                 const rolePageVisibility = {
                     'admin': { blinds: true, pvc: true, wood: true, rail: true, roller: true, settings: true },
-                    'user': { blinds: true, pvc: true, wood: true, rail: true, roller: true, settings: false }, // Example: regular users can't see settings
-                    'anonymous': { blinds: true, pvc: true, wood: true, rail: true, roller: true, settings: false } // Anonymous users can't see settings
+                    'user': { blinds: true, pvc: true, wood: true, rail: true, roller: true, settings: false },
+                    'anonymous': { blinds: true, pvc: true, wood: true, rail: true, roller: true, settings: false }
                 };
 
-                // Get the effective visibility based on current user's role
-                const effectiveVisibility = rolePageVisibility[userRole] || rolePageVisibility['anonymous'];
+                // Determine effective visibility: user-specific permissions override role-based
+                let effectiveVisibility = {};
+                if (userPermissions && Object.keys(userPermissions).length > 0) {
+                    console.log("Using user-specific permissions:", userPermissions);
+                    effectiveVisibility = userPermissions; // Use user's specific allowedPages
+                } else {
+                    console.log("Using role-based permissions for role:", userRole);
+                    effectiveVisibility = appConfig.userRoles[userRole]?.allowedPages || rolePageVisibility['anonymous']; // Fallback to role or anonymous
+                }
 
                 let firstVisiblePage = null;
-                Object.keys(pageElements).forEach(pageKey => { // Iterate through all page keys
-                    const isVisible = effectiveVisibility[pageKey] !== false; // Check effective visibility
+                Object.keys(pageElements).forEach(pageKey => { 
+                    const isVisible = effectiveVisibility[pageKey] !== false; 
                     if (tabElements[pageKey]) {
                         tabElements[pageKey].style.display = isVisible ? 'block' : 'none';
                     }
@@ -1212,9 +1330,9 @@
                     },
                     // Define role-based permissions (default values)
                     userRoles: {
-                        'admin': { allowedPages: ['blinds', 'pvc', 'wood', 'rail', 'roller', 'settings'], canManageUsers: true, canEditPrices: true },
-                        'user': { allowedPages: ['blinds', 'pvc', 'wood', 'rail', 'roller'], canManageUsers: false, canEditPrices: false },
-                        'anonymous': { allowedPages: ['blinds', 'pvc', 'wood', 'rail', 'roller'], canManageUsers: false, canEditPrices: false }
+                        'admin': { allowedPages: {blinds: true, pvc: true, wood: true, rail: true, roller: true, settings: true}, canManageUsers: true, canEditPrices: true },
+                        'user': { allowedPages: {blinds: true, pvc: true, wood: true, rail: true, roller: true, settings: false}, canManageUsers: false, canEditPrices: false },
+                        'anonymous': { allowedPages: {blinds: true, pvc: true, wood: true, rail: true, roller: true, settings: false}, canManageUsers: false, canEditPrices: false }
                     }
                 };
                 appConfig = defaultConfig;
@@ -1269,16 +1387,11 @@
             };
 
             const saveAdminChanges = async () => {
-                // This function now saves global price and visibility settings
-                // User management will be handled separately (or requires more complex UI here)
                 const newConfig = JSON.parse(JSON.stringify(appConfig));
                 
-                // Update page visibility based on admin panel (this will update global defaults)
+                // Update page visibility based on admin panel (this is for global defaults if needed)
                 document.querySelectorAll('#visibility-controls input').forEach(input => { 
                     const pageKey = input.dataset.page;
-                    // This part needs careful consideration for role-based visibility.
-                    // For now, it updates the global pageVisibility, which is less precise for per-user control.
-                    // A proper implementation would allow admin to modify `appConfig.userRoles` directly.
                     newConfig.pageVisibility[pageKey] = input.checked; 
                 });
                 
@@ -1422,12 +1535,12 @@
                 // Populate User Management Section
                 const userListContainer = document.getElementById('user-list');
                 userListContainer.innerHTML = '<li>กำลังโหลดผู้ใช้...</li>';
-                console.log("Attempting to fetch users from:", `artifacts/${appId}/users`); // Log the path
+                console.log("Attempting to fetch users from:", `artifacts/${appId}/users`); 
                 try {
                     const usersCollectionRef = collection(db, `artifacts/${appId}/users`);
                     const userQuerySnapshot = await getDocs(usersCollectionRef);
-                    console.log("User fetch successful. Number of documents:", userQuerySnapshot.docs.length); // Log success
-                    userListContainer.innerHTML = ''; // Clear loading message
+                    console.log("User fetch successful. Number of documents:", userQuerySnapshot.docs.length); 
+                    userListContainer.innerHTML = ''; 
                     if (userQuerySnapshot.empty) {
                         userListContainer.innerHTML = '<li class="text-slate-500">ยังไม่มีผู้ใช้ในระบบ</li>';
                     } else {
@@ -1440,36 +1553,95 @@
                             userLi.className = 'flex justify-between items-center p-2 bg-slate-100 rounded';
                             userLi.innerHTML = `
                                 <span>${userEmail} (Role: ${userRole})</span>
-                                <button data-uid="${userId}" data-current-role="${userRole}" class="edit-user-role-btn text-blue-500 hover:text-blue-700 px-2 py-1 rounded">แก้ไขบทบาท</button>
+                                <button data-uid="${userId}" data-email="${userEmail}" class="edit-user-btn text-blue-500 hover:text-blue-700 px-2 py-1 rounded">แก้ไข</button>
                             `;
                             userListContainer.appendChild(userLi);
                         });
-                        userListContainer.querySelectorAll('.edit-user-role-btn').forEach(btn => {
+                        userListContainer.querySelectorAll('.edit-user-btn').forEach(btn => {
                             btn.addEventListener('click', async (e) => {
                                 const uid = e.target.dataset.uid;
-                                const currentRole = e.target.dataset.currentRole;
-                                const newRole = prompt(`เปลี่ยนบทบาทสำหรับผู้ใช้ ${uid} จาก ${currentRole} เป็น (admin/user):`);
-                                if (newRole && (newRole === 'admin' || newRole === 'user')) {
-                                    try {
-                                        await setDoc(doc(db, `artifacts/${appId}/users/${uid}`), { role: newRole }, { merge: true });
-                                        alert('เปลี่ยนบทบาทสำเร็จ!');
-                                        openAdminPanel(); // Refresh admin panel
-                                    } catch (error) {
-                                        console.error("Error updating user role:", error);
-                                        alert('เกิดข้อผิดพลาดในการเปลี่ยนบทบาท: ' + error.message);
-                                    }
-                                } else if (newRole !== null) {
-                                    alert('บทบาทไม่ถูกต้อง! ต้องเป็น "admin" หรือ "user"');
-                                }
+                                const email = e.target.dataset.email;
+                                await openUserEditModal(uid, email);
                             });
                         });
                     }
                 } catch (error) {
-                    console.error("Detailed error fetching users:", error); // More detailed error logging
-                    userListContainer.innerHTML = '<li class="text-red-500">เกิดข้อผิดพลาดในการโหลดผู้ใช้</li>';
+                    console.error("Detailed error fetching users:", error); 
+                    userListContainer.innerHTML = '<li class="text-red-500">เกิดข้อผิดพลาดในการโหลดผู้ใช้: ' + error.message + '</li>';
                 }
 
                 adminPanelModal.style.display = 'flex';
+            };
+
+            const openUserEditModal = async (uid, email) => {
+                editUserEmailSpan.textContent = email;
+                editUserUidInput.value = uid;
+                editUserAllowedPagesDiv.innerHTML = ''; // Clear previous checkboxes
+
+                const userDocRef = doc(db, `artifacts/${appId}/users/${uid}`);
+                const userDocSnap = await getDoc(userDocRef);
+                let userData = {};
+                if (userDocSnap.exists()) {
+                    userData = userDocSnap.data();
+                }
+
+                editUserRoleSelect.value = userData.role || 'user';
+
+                // Populate allowed pages checkboxes
+                const allPageKeys = Object.keys(pageElements); // Get all possible page keys
+                allPageKeys.forEach(pageKey => {
+                    const isAllowed = (userData.allowedPages && userData.allowedPages.includes(pageKey)) || false; // Check if user has specific permission
+                    const pageName = tabElements[pageKey]?.textContent || pageKey; // Get display name from tab, or use key
+                    const checkboxHtml = `
+                        <div>
+                            <input type="checkbox" id="page-${pageKey}-${uid}" data-page-key="${pageKey}" ${isAllowed ? 'checked' : ''} class="mr-2">
+                            <label for="page-${pageKey}-${uid}">${pageName}</label>
+                        </div>
+                    `;
+                    editUserAllowedPagesDiv.insertAdjacentHTML('beforeend', checkboxHtml);
+                });
+
+                // Populate custom prices textarea
+                editUserCustomPricesTextarea.value = JSON.stringify(userData.customPrices || {}, null, 2);
+
+                userEditModal.style.display = 'flex';
+            };
+
+            const saveUserChanges = async () => {
+                const uid = editUserUidInput.value;
+                const newRole = editUserRoleSelect.value;
+                
+                // Get selected allowed pages
+                const selectedAllowedPages = [];
+                editUserAllowedPagesDiv.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+                    selectedAllowedPages.push(checkbox.dataset.pageKey);
+                });
+
+                // Get custom prices
+                let newCustomPrices = {};
+                try {
+                    const customPricesJson = editUserCustomPricesTextarea.value.trim();
+                    if (customPricesJson) {
+                        newCustomPrices = JSON.parse(customPricesJson);
+                    }
+                } catch (e) {
+                    alert('รูปแบบ JSON ของราคาเฉพาะไม่ถูกต้อง: ' + e.message);
+                    return;
+                }
+
+                try {
+                    await setDoc(doc(db, `artifacts/${appId}/users/${uid}`), { 
+                        role: newRole,
+                        allowedPages: selectedAllowedPages, // Save as array
+                        customPrices: newCustomPrices
+                    }, { merge: true });
+                    alert('บันทึกการเปลี่ยนแปลงผู้ใช้สำเร็จ!');
+                    userEditModal.style.display = 'none';
+                    openAdminPanel(); // Refresh admin panel to show updated roles
+                } catch (error) {
+                    console.error("Error saving user changes:", error);
+                    alert('เกิดข้อผิดพลาดในการบันทึกการเปลี่ยนแปลงผู้ใช้: ' + error.message);
+                }
             };
 
             const createRollerTypeHTML = (typeName = '', typeData = { price: 0, codes: [] }) => {
@@ -1722,7 +1894,9 @@
                         await setDoc(doc(db, `artifacts/${appId}/users/${userCredential.user.uid}`), {
                             email: userCredential.user.email,
                             role: 'user',
-                            createdAt: serverTimestamp()
+                            createdAt: serverTimestamp(),
+                            allowedPages: [], // Initialize with empty array
+                            customPrices: {} // Initialize with empty object
                         });
                         alert('สมัครสมาชิกสำเร็จ! คุณได้เข้าสู่ระบบแล้ว');
                     } else {
@@ -1793,6 +1967,11 @@
             document.getElementById('admin-save-btn').addEventListener('click', saveAdminChanges);
             // Add event listener for save settings button
             document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+
+            // User Edit Modal Buttons
+            userEditCloseBtn.addEventListener('click', () => { userEditModal.style.display = 'none'; });
+            saveUserChangesBtn.addEventListener('click', saveUserChanges);
+
 
             document.getElementById('add-pvc-price-btn').addEventListener('click', () => document.getElementById('pvc-price-controls').appendChild(createPriceItemHTML()));
             document.getElementById('add-wood-price-btn').addEventListener('click', () => document.getElementById('wood-price-controls').appendChild(createPriceItemHTML()));
