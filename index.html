@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
@@ -487,12 +487,16 @@
                     doc.addFont("Sarabun-Regular-normal.ttf", "Sarabun-Regular", "normal");
                     doc.setFont("Sarabun-Regular", "normal");
                     doc.setFontSize(18);
-                    doc.text(title, 105, 20, { align: 'center' });
+                    doc.text('ใบเสนอราคา', 105, 20, { align: 'center' }); // หัวเรื่องหลัก "ใบเสนอราคา"
                     doc.setFontSize(10);
-                    doc.text('Blinds Design Co., Ltd. (ตัวอย่าง)', 20, 30);
-                    const today = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
-                    doc.text(`วันที่: ${today}`, 200, 30, { align: 'right' });
-                    let startY = 40;
+                    doc.text('บริษัท Blinds Design จำกัด (ตัวอย่าง)', 20, 30);
+                    doc.text('ที่อยู่: 123 ถนนตัวอย่าง, เขตตัวอย่าง, จังหวัดตัวอย่าง 12345', 20, 36);
+                    doc.text('โทรศัพท์: 081-XXX-XXXX', 20, 42);
+                    doc.text('เลขประจำตัวผู้เสียภาษี: 1234567890123', 20, 48);
+const today = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+doc.text(`วันที่: ${today}`, 200, 30, { align: 'right' });
+doc.text(`เลขที่ใบเสนอราคา: QTN-${new Date().getTime().toString().slice(-6)}`, 200, 36, { align: 'right' }); // เพิ่มเลขที่ใบเสนอราคา
+let startY = 55; // ปรับตำแหน่งเริ่มต้นของตาราง;
                     if (extraInfo.length > 0) {
                         doc.setFontSize(12);
                         extraInfo.forEach(info => {
@@ -501,17 +505,68 @@
                         });
                     }
                     doc.autoTable({
-                        head: [columns],
-                        body: body,
-                        startY: startY + 5,
-                        theme: 'grid',
-                        headStyles: { font: "Sarabun-Regular", fontStyle: 'bold', fillColor: [22, 160, 133], textColor: 255 },
-                        styles: { font: "Sarabun-Regular", fontStyle: 'normal' }
-                    });
+    head: [columns],
+    body: body,
+    startY: startY + 5,
+    theme: 'striped', // เปลี่ยนเป็น 'striped' หรือ 'grid' เพื่อความสวยงาม
+    headStyles: { 
+        font: "Sarabun-Regular", 
+        fontStyle: 'bold', 
+        fillColor: [30, 144, 255], // เปลี่ยนสีพื้นหลังหัวตาราง (สีน้ำเงิน)
+        textColor: 255, // สีตัวอักษรขาว
+        halign: 'center' // จัดกลางหัวตาราง
+    },
+    styles: { 
+        font: "Sarabun-Regular", 
+        fontStyle: 'normal',
+        fontSize: 10, // ปรับขนาดฟอนต์ในตาราง
+        cellPadding: 2 // เพิ่ม padding ในเซลล์
+    },
+    columnStyles: { // จัดแนวข้อมูลในคอลัมน์
+        0: { halign: 'center' }, // ลำดับ
+        // เพิ่มเติมสำหรับแต่ละประเภทใบเสนอราคาเพื่อให้จัดแนวสวยงาม
+        // ตัวอย่าง: สำหรับ pvc/wood/roller:
+        // 1: { halign: 'left' }, // รายการ/ขนาดที่กรอก
+        // 2: { halign: 'left' }, // ขนาดที่คำนวณ/กว้าง
+        // 3: { halign: 'center' }, // จำนวน/การปรับ
+        // 4: { halign: 'center' }, // จำนวน
+        // 5: { halign: 'right' }, // ราคารวม
+    },
+    didParseCell: function(data) { // จัดรูปแบบราคารวม
+        if (data.section === 'body' && data.column.index === columns.length - 1) {
+            data.cell.styles.halign = 'right';
+        }
+    }
+});
                     let finalY = doc.lastAutoTable.finalY;
                     doc.setFontSize(12);
                     doc.text('ยอดรวมสุทธิ:', 140, finalY + 10);
                     doc.text(`THB ${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`, 200, finalY + 10, { align: 'right' });
+                    finalY = doc.lastAutoTable.finalY + 20; // เพิ่มระยะห่างจากตาราง
+doc.setFontSize(10);
+doc.text('เงื่อนไขการชำระเงิน: ชำระเต็มจำนวนภายใน 7 วันหลังการติดตั้ง', 20, finalY + 10); // ตัวอย่างเงื่อนไข
+doc.text('เงื่อนไขการส่งมอบ: ติดตั้งภายใน 14 วันทำการ หลังยืนยันการสั่งซื้อ', 20, finalY + 17); // ตัวอย่างเงื่อนไข
+
+finalY = finalY + 40; // ปรับตำแหน่งสำหรับช่องลายเซ็น
+
+// ช่องลายเซ็น
+const signatureLineLength = 60; // ความยาวเส้นลายเซ็น
+const signatureSpacing = 60; // ระยะห่างระหว่างช่องลายเซ็น
+
+// ผู้เสนอราคา
+doc.line(20, finalY, 20 + signatureLineLength, finalY);
+doc.text('ผู้เสนอราคา', 20 + signatureLineLength / 2, finalY + 5, { align: 'center' });
+doc.text('(_______________________________)', 20 + signatureLineLength / 2, finalY + 12, { align: 'center' });
+
+// ผู้ตรวจสอบ
+doc.line(20 + signatureSpacing, finalY, 20 + signatureSpacing + signatureLineLength, finalY);
+doc.text('ผู้ตรวจสอบ', 20 + signatureSpacing + signatureLineLength / 2, finalY + 5, { align: 'center' });
+doc.text('(_______________________________)', 20 + signatureSpacing + signatureLineLength / 2, finalY + 12, { align: 'center' });
+
+// ผู้อนุมัติ
+doc.line(20 + signatureSpacing * 2, finalY, 20 + signatureSpacing * 2 + signatureLineLength, finalY);
+doc.text('ผู้อนุมัติ', 20 + signatureSpacing * 2 + signatureLineLength / 2, finalY + 5, { align: 'center' });
+doc.text('(_______________________________)', 20 + signatureSpacing * 2 + signatureLineLength / 2, finalY + 12, { align: 'center' });
                     doc.save(filename);
                 } catch (e) {
                     console.error("PDF Generation Error: ", e);
@@ -997,11 +1052,12 @@
                         const date = quote.createdAt?.toDate ? quote.createdAt.toDate().toLocaleDateString('th-TH') : 'N/A';
                         const el = document.createElement('div');
                         el.className = 'flex justify-between items-center p-2 bg-slate-100 rounded';
-                        el.innerHTML = `<div><p class="font-bold">${quote.title}</p><p class="text-xs text-slate-500">บันทึกเมื่อ: ${date}</p></div><div class="flex space-x-2"><button data-id="${quote.id}" class="view-quote-btn text-blue-500 hover:text-blue-700 px-2 py-1 rounded">ดู</button><button data-id="${quote.id}" class="delete-quote-btn text-red-500 hover:text-red-700 px-2 py-1 rounded">ลบ</button></div>`;
+                        el.innerHTML = `<div><p class="font-bold">${quote.title}</p><p class="text-xs text-slate-500">บันทึกเมื่อ: ${date}</p></div><div class="flex space-x-2"><button data-id="${quote.id}" class="view-quote-btn text-blue-500 hover:text-blue-700 px-2 py-1 rounded">ดู</button><button data-id="${quote.id}" data-type="${quote.type}" data-title="${quote.title}" class="download-saved-quote-btn text-green-500 hover:text-green-700 px-2 py-1 rounded">ดาวน์โหลด</button><button data-id="${quote.id}" class="delete-quote-btn text-red-500 hover:text-red-700 px-2 py-1 rounded">ลบ</button></div>`;
                         list.appendChild(el);
                     });
                     list.querySelectorAll('.delete-quote-btn').forEach(btn => btn.addEventListener('click', deleteQuotation));
                     list.querySelectorAll('.view-quote-btn').forEach(btn => btn.addEventListener('click', viewQuotation));
+                    list.querySelectorAll('.download-saved-quote-btn').forEach(btn => btn.addEventListener('click', downloadSavedQuotation));
                 }, (error) => {
                     console.error("Error fetching quotations: ", error);
                     document.getElementById('saved-quotations-list').innerHTML = `<p class="text-red-500 text-center">เกิดข้อผิดพลาดในการดึงข้อมูลใบเสนอราคา</p>`;
@@ -1191,7 +1247,58 @@
                     }
                 }
             };
-            
+            const downloadSavedQuotation = async (event) => {
+    const id = event.target.dataset.id;
+    const type = event.target.dataset.type;
+    const title = event.target.dataset.title;
+    const docRef = doc(db, `artifacts/${appId}/public/data/quotations`, id);
+    try {
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            const quote = docSnap.data();
+            let columns = [];
+            let rows = [];
+            let total = quote.data.totalCost || 0;
+            let extraInfo = [];
+
+            switch (quote.type) {
+                case 'blinds':
+                    columns = ["ลำดับ", "รายการ", "ขนาด (ซม.)", "ราคา (บาท)"];
+                    if(quote.data.normalPrice !== null) { rows.push([1, 'มู่ลี่อลูมิเนียม (ธรรมดา)', `${quote.data.originalWidth} x ${quote.data.originalHeight}`, quote.data.normalPrice.toLocaleString('en-US',{minimumFractionDigits: 2})]); }
+                    if(quote.data.chainPrice !== null) { rows.push([rows.length+1, 'มู่ลี่อลูมิเนียม (โซ่)', `${quote.data.originalWidth} x ${quote.data.originalHeight}`, quote.data.chainPrice.toLocaleString('en-US',{minimumFractionDigits: 2})]); }
+                    total = (quote.data.normalPrice || 0) + (quote.data.chainPrice || 0);
+                    break;
+                case 'pvc':
+                    columns = ["ลำดับ", "ขนาดที่กรอก", "ขนาดที่คำนวณ", "จำนวน", "ราคารวม (บาท)"];
+                    rows = quote.data.items.map(item => [item.no, `${item.width} x ${item.height}`, `${item.calcWidth.toFixed(2)} x ${item.calcHeight.toFixed(2)}`, item.qty, item.itemCost.toLocaleString('en-US', {minimumFractionDigits: 2})]);
+                    extraInfo = [{label: 'ประเภทสินค้า', value: quote.data.priceText}, {label: 'รหัสสินค้า', value: quote.data.productCode}, {label: 'รูปแบบการเปิด', value: quote.data.openingStyle}];
+                    break;
+                case 'wood':
+                    columns = ["ลำดับ", "ขนาดที่กรอก", "ขนาดที่คำนวณ", "การปรับ", "จำนวน", "ราคารวม (บาท)"];
+                    rows = quote.data.items.map(item => [item.no, `${item.width} x ${item.height}`, `${item.calcWidth.toFixed(2)} x ${item.calcHeight.toFixed(2)}`, item.adjust, item.qty, item.itemCost.toLocaleString('en-US', {minimumFractionDigits: 2})]);
+                    extraInfo = [{label: 'ประเภทสินค้า', value: quote.data.priceText}];
+                    break;
+                case 'rail':
+                    columns = ["ลำดับ", "รายการ", "กว้าง (ซม.)", "จำนวน", "ราคา (บาท)"];
+                    rows = quote.data.items.map(item => [item.no, item.description, item.width, item.qty, item.itemCost.toLocaleString('en-US', {minimumFractionDigits: 2})]);
+                    break;
+                case 'roller':
+                    columns = ["ลำดับ", "ขนาด (ซม.)", "การปรับ", "จำนวน", "ราคารวม (บาท)"];
+                    rows = quote.data.items.map(item => [item.no, `${item.width} x ${item.height}`, item.adjust, item.qty, item.itemCost.toLocaleString('en-US', {minimumFractionDigits: 2})]);
+                    extraInfo = [
+                        {label: 'ประเภท', value: quote.data.category}, 
+                        {label: 'รุ่นสินค้า', value: quote.data.type},
+                        {label: 'รหัสสินค้า', value: quote.data.code}
+                    ];
+                    break;
+            }
+            generatePdf(title, columns, rows, total, `${title}.pdf`, extraInfo);
+        }
+    } catch (e) {
+        console.error("Error downloading saved quotation: ", e);
+        alert('ไม่สามารถดาวน์โหลดใบเสนอราคาได้: ' + e.message);
+    }
+};
             const viewQuotation = async (event) => {
                 const id = event.target.dataset.id;
                 const docRef = doc(db, `artifacts/${appId}/public/data/quotations`, id);
