@@ -303,10 +303,23 @@
             const addPvcRow = () => {
                 const container = document.getElementById('pvc-rows-container');
                 pvcRowCount++;
+                if (pvcRowCount > 10) { alert('สามารถเพิ่มได้สูงสุด 10 รายการ'); pvcRowCount--; return; }
                 const rowId = `pvc-row-${pvcRowCount}`;
                 const rowHtml = `<div id="${rowId}" class="calculation-row grid grid-cols-12 gap-2 items-center"><span class="col-span-1 text-center text-slate-500">${pvcRowCount}.</span><input type="number" step="any" placeholder="กว้าง (ซม.)" class="w-full p-2 border rounded-md col-span-3"><input type="number" step="any" placeholder="สูง (ซม.)" class="w-full p-2 border rounded-md col-span-3"><input type="number" value="1" placeholder="จำนวน" class="w-full p-2 border rounded-md col-span-3"><button data-row-id="${rowId}" class="remove-row-btn col-span-2 text-red-500 hover:text-red-700 font-bold">ลบ</button></div>`;
                 container.insertAdjacentHTML('beforeend', rowHtml);
-                container.querySelector(`button[data-row-id="${rowId}"]`).addEventListener('click', (e) => {
+                
+                // เติมรายการรหัสสินค้าในแถวจาก rollerAllCodes (ถ้ามี)
+                (function(){
+                    try{
+                        const newRow = document.getElementById(rowId);
+                        const codeSel = newRow && newRow.querySelector('.roller-code-select');
+                        const allCodes = (window.rollerAllCodes||[]);
+                        if(codeSel && allCodes.length){
+                            codeSel.innerHTML = '<option value=\"\">เลือกรหัสสินค้า (ต่อแถว)</option>' + allCodes.map(c => `<option value="${c}">${c}</option>`).join('');
+                        }
+                    }catch(_e){}
+                })();
+    container.querySelector(`button[data-row-id="${rowId}"]`).addEventListener('click', (e) => {
                     e.target.closest('.calculation-row').remove();
                     pvcRowCount = container.querySelectorAll('.calculation-row').length;
                      container.querySelectorAll('.calculation-row').forEach((row, index) => {
@@ -318,6 +331,7 @@
             const addWoodRow = () => {
                 const container = document.getElementById('wood-rows-container');
                 let rowCounter = container.querySelectorAll('.calculation-row').length;
+                if (rowCounter >= 10) { alert('สามารถเพิ่มได้สูงสุด 10 รายการ'); return; }
                 rowCounter++;
                 const rowId = `wood-row-${rowCounter}`;
                 const rowHtml = `
@@ -337,7 +351,19 @@
                         </div>
                     </div>`;
                 container.insertAdjacentHTML('beforeend', rowHtml);
-                container.querySelector(`button[data-row-id="${rowId}"]`).addEventListener('click', (e) => {
+                
+                // เติมรายการรหัสสินค้าในแถวจาก rollerAllCodes (ถ้ามี)
+                (function(){
+                    try{
+                        const newRow = document.getElementById(rowId);
+                        const codeSel = newRow && newRow.querySelector('.roller-code-select');
+                        const allCodes = (window.rollerAllCodes||[]);
+                        if(codeSel && allCodes.length){
+                            codeSel.innerHTML = '<option value=\"\">เลือกรหัสสินค้า (ต่อแถว)</option>' + allCodes.map(c => `<option value="${c}">${c}</option>`).join('');
+                        }
+                    }catch(_e){}
+                })();
+    container.querySelector(`button[data-row-id="${rowId}"]`).addEventListener('click', (e) => {
                     e.target.closest('.calculation-row').remove();
                     container.querySelectorAll('.calculation-row').forEach((row, index) => {
                         row.querySelector('.font-bold').textContent = `รายการที่ ${index + 1}`;
@@ -356,7 +382,7 @@
                             <span class="font-bold text-slate-700">รายการที่ ${rowCounter}</span>
                             <button data-row-id="${rowId}" class="remove-row-btn text-red-500 hover:text-red-700 font-bold">ลบ</button>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-5 gap-2">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
                             <input type="number" step="any" placeholder="กว้าง (ซม.)" class="w-full p-2 border rounded-md roller-width">
                             <input type="number" step="any" placeholder="สูง (ซม.)" class="w-full p-2 border rounded-md roller-height">
                             <input type="number" value="1" placeholder="จำนวน" class="w-full p-2 border rounded-md roller-qty">
@@ -364,11 +390,27 @@
                                 <option>ปรับซ้าย</option>
                                 <option>ปรับขวา</option>
                             </select>
-                            <input type="text" placeholder="รหัสสินค้า (กำหนดเองได้)" class="w-full p-2 border rounded-md roller-code-override">
+                            <!-- เลือกรหัสสินค้าต่อแถว -->
+                            <select class="w-full p-2 border rounded-md roller-code-select">
+                                <option value="">เลือกรหัสสินค้า (ต่อแถว)</option>
+                            </select>
+        
                         </div>
                     </div>`;
                 container.insertAdjacentHTML('beforeend', rowHtml);
-                container.querySelector(`button[data-row-id="${rowId}"]`).addEventListener('click', (e) => {
+                
+                // เติมรายการรหัสสินค้าในแถวจาก rollerAllCodes (ถ้ามี)
+                (function(){
+                    try{
+                        const newRow = document.getElementById(rowId);
+                        const codeSel = newRow && newRow.querySelector('.roller-code-select');
+                        const allCodes = (window.rollerAllCodes||[]);
+                        if(codeSel && allCodes.length){
+                            codeSel.innerHTML = '<option value=\"\">เลือกรหัสสินค้า (ต่อแถว)</option>' + allCodes.map(c => `<option value="${c}">${c}</option>`).join('');
+                        }
+                    }catch(_e){}
+                })();
+    container.querySelector(`button[data-row-id="${rowId}"]`).addEventListener('click', (e) => {
                     e.target.closest('.calculation-row').remove();
                     container.querySelectorAll('.calculation-row').forEach((row, index) => {
                         row.querySelector('.font-bold').textContent = `รายการที่ ${index + 1}`;
@@ -379,6 +421,7 @@
             const addRailRow = () => {
                 const container = document.getElementById('rail-rows-container');
                 let currentRowCount = container.querySelectorAll('.calculation-row').length;
+                if (currentRowCount >= 10) { alert('สามารถเพิ่มได้สูงสุด 10 รายการ'); return; }
                 currentRowCount++;
                 const rowHtml = `
                     <div class="calculation-row p-4 border rounded-lg space-y-3 bg-slate-50">
@@ -435,7 +478,19 @@
                         </div>
                     </div>`;
                 container.insertAdjacentHTML('beforeend', rowHtml);
-                const newRow = container.querySelector('.calculation-row:last-child');
+                
+                // เติมรายการรหัสสินค้าในแถวจาก rollerAllCodes (ถ้ามี)
+                (function(){
+                    try{
+                        const newRow = document.getElementById(rowId);
+                        const codeSel = newRow && newRow.querySelector('.roller-code-select');
+                        const allCodes = (window.rollerAllCodes||[]);
+                        if(codeSel && allCodes.length){
+                            codeSel.innerHTML = '<option value=\"\">เลือกรหัสสินค้า (ต่อแถว)</option>' + allCodes.map(c => `<option value="${c}">${c}</option>`).join('');
+                        }
+                    }catch(_e){}
+                })();
+    const newRow = container.querySelector('.calculation-row:last-child');
                 newRow.querySelector('.remove-row-btn').addEventListener('click', (e) => {
                     e.target.closest('.calculation-row').remove();
                     container.querySelectorAll('.calculation-row').forEach((row, index) => {
@@ -807,7 +862,8 @@ doc.text('(_______________________________)', 20 + signatureSpacing * 2 + signat
                 const priceText = priceDisplay.textContent.replace(/[^0-9.]/g, '');
                 const price = parseFloat(priceText);
                 
-                if (isNaN(price) || price <= 0) {
+                
+                const topCode = (document.getElementById('rollerCodeSelect')||{}).value || '';if (isNaN(price) || price <= 0) {
                     errorDiv.textContent = 'กรุณาเลือกรุ่นสินค้าที่มีราคาถูกต้อง';
                     return;
                 }
@@ -826,7 +882,14 @@ doc.text('(_______________________________)', 20 + signatureSpacing * 2 + signat
                     const qtyInput = row.querySelector('.roller-qty');
                     const adjustSelect = row.querySelector('.roller-adjust');
                     
-                    [widthInput, heightInput, qtyInput].forEach(i => i.classList.remove('border-red-500'));
+                    
+                    const codeSelect = row.querySelector('.roller-code-select');
+                    const itemCode = codeSelect && codeSelect.value ? codeSelect.value : '';
+                    let rowPrice = price;
+                    if(itemCode && window.rollerCodePriceMap && window.rollerCodePriceMap[itemCode]){
+                        rowPrice = Number(window.rollerCodePriceMap[itemCode]) || price;
+                    }
+        [widthInput, heightInput, qtyInput].forEach(i => i.classList.remove('border-red-500'));
 
                     const originalWidth = parseFloat(widthInput.value);
                     const originalHeight = parseFloat(heightInput.value);
@@ -845,12 +908,9 @@ doc.text('(_______________________________)', 20 + signatureSpacing * 2 + signat
 
                     const widthInMeters = normalizeToMeters(originalWidth);
                     const heightInMeters = normalizeToMeters(originalHeight);
-                    const codeOverride = (row.querySelector('.roller-code-override')?.value || '').trim();
-                    const lookedUp = codeOverride ? getRollerPriceByCode(codeOverride) : null;
-                    const priceForRow = (lookedUp && !isNaN(lookedUp)) ? lookedUp : price;
-                    const itemCost = widthInMeters * heightInMeters * 1.2 * priceForRow * qty;
+                    const itemCost = widthInMeters * heightInMeters * 1.2 * rowPrice * qty;
                     totalCost += itemCost;
-                    itemsForPdf.push({ no: index + 1, width: originalWidth, height: originalHeight, qty: qty, adjust: adjust, itemCost: itemCost });
+                    itemsForPdf.push({ code: (itemCode || topCode), no: index + 1, width: originalWidth, height: originalHeight, qty: qty, adjust: adjust, itemCost: itemCost });
                 });
 
                 if (!allRowsValid) {
@@ -878,38 +938,34 @@ doc.text('(_______________________________)', 20 + signatureSpacing * 2 + signat
                 document.getElementById('rollerSaveBtn').disabled = false;
             };
             
-            
-            // หา price จากรหัสม่านม้วน (ค้นใน appConfig.prices.roller)
-            const getRollerPriceByCode = (code) => {
-                if (!code) return null;
-                const rollerData = appConfig?.prices?.roller;
-                if (!rollerData) return null;
-                const norm = (s) => (s||'').toString().trim().toUpperCase();
-                const target = norm(code);
-                for (const cat of Object.keys(rollerData)) {
-                    const catObj = rollerData[cat] || {};
-                    for (const typ of Object.keys(catObj)) {
-                        const info = catObj[typ];
-                        if (info && Array.isArray(info.codes)) {
-                            for (const c of info.codes) {
-                                if (norm(c) === target) {
-                                    const p = parseFloat(info.price);
-                                    return isNaN(p) ? null : p;
-                                }
-                            }
-                        }
-                    }
-                }
-                return null;
-            };
-const populateRollerDropdowns = () => {
+            const populateRollerDropdowns = () => {
                 const rollerData = appConfig.prices?.roller;
                 if (!rollerData) {
                     console.error("Roller blinds price data not loaded.");
                     return;
                 }
                 
-                const categorySelect = document.getElementById('rollerCategorySelect');
+                
+                // สร้างแผนที่รหัสสินค้า -> ราคา และรายการรหัสทั้งหมด (ครั้งเดียว)
+                (function(){
+                    try{
+                        const map = {};
+                        const list = [];
+                        if(rollerData){
+                            Object.keys(rollerData).forEach(cat => {
+                                const types = rollerData[cat]||{};
+                                Object.keys(types).forEach(t => {
+                                    const info = types[t]||{};
+                                    const price = Number(info.price)||0;
+                                    (info.codes||[]).forEach(cd => { map[cd] = price; list.push(cd); });
+                                });
+                            });
+                        }
+                        window.rollerCodePriceMap = map;
+                        window.rollerAllCodes = Array.from(new Set(list)).sort();
+                    }catch(e){ console.warn('rollerCodePriceMap build failed', e); }
+                })();
+        const categorySelect = document.getElementById('rollerCategorySelect');
                 const typeSelect = document.getElementById('rollerTypeSelect');
                 const codeSelect = document.getElementById('rollerCodeSelect');
                 const priceDisplay = document.getElementById('rollerPriceDisplay');
@@ -1307,8 +1363,8 @@ const populateRollerDropdowns = () => {
                     rows = quote.data.items.map(item => [item.no, item.description, item.width, item.qty, item.itemCost.toLocaleString('en-US', {minimumFractionDigits: 2})]);
                     break;
                 case 'roller':
-                    columns = ["ลำดับ", "ขนาด (ซม.)", "การปรับ", "จำนวน", "ราคารวม (บาท)"];
-                    rows = quote.data.items.map(item => [item.no, `${item.width} x ${item.height}`, item.adjust, item.qty, item.itemCost.toLocaleString('en-US', {minimumFractionDigits: 2})]);
+                    columns = [\"ลำดับ\", \"รหัสสินค้า\", \"ขนาด (ซม.)\", \"การปรับ\", \"จำนวน\", \"ราคารวม (บาท)\"];
+                    rows = quote.data.items.map(item => [ item.no, (item.code || quote.data.code || ''), `${item.width} x ${item.height}`, item.adjust, item.qty, item.itemCost.toLocaleString('en-US', {minimumFractionDigits: 2})]);
                     extraInfo = [
                         {label: 'ประเภท', value: quote.data.category}, 
                         {label: 'รุ่นสินค้า', value: quote.data.type},
@@ -1524,8 +1580,8 @@ const populateRollerDropdowns = () => {
             document.getElementById('rollerCalculateBtn').addEventListener('click', handleRollerCalculation);
             document.getElementById('rollerPdfBtn').addEventListener('click', () => {
                 const data = rollerCalculatedData; if(!data) return;
-                const columns = ["ลำดับ", "ขนาด (ซม.)", "การปรับ", "จำนวน", "ราคารวม (บาท)"];
-                const rows = data.items.map(item => [item.no, `${item.width} x ${item.height}`, item.adjust, item.qty, item.itemCost.toLocaleString('en-US', {minimumFractionDigits: 2})]);
+                const columns = [\"ลำดับ\", \"รหัสสินค้า\", \"ขนาด (ซม.)\", \"การปรับ\", \"จำนวน\", \"ราคารวม (บาท)\"];
+                const rows = data.items.map(item => [ item.no, (item.code || data.code || ''), `${item.width} x ${item.height}`, item.adjust, item.qty, item.itemCost.toLocaleString('en-US', {minimumFractionDigits: 2})]);
                 const extraInfo = [
                     {label: 'ประเภท', value: data.category}, 
                     {label: 'รุ่นสินค้า', value: data.type},
