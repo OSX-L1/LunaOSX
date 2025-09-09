@@ -466,16 +466,11 @@
 
             const normalizeToMeters = (value) => (value >= 10) ? value / 100 : value;
             const calculatePvcHeight = (h) => {
-              // Map the measured height to the nearest supported step in the
-                // PVC curtain pricing tables. Values are rounded down so that
-                // minor measurement excesses (เช่น 2.22m) do not bump the cost
-                // to the next tier (ดังนั้นจะถูกจัดอยู่ในขั้น 2.2m).
-
-                const standardHeights = [2.0, 2.2, 2.4, 2.6, 2.8, 3.0, 3.3, 3.5, 3.7];
-                for (let i = standardHeights.length - 1; i >= 0; i--) {
-                    if (h >= standardHeights[i]) return standardHeights[i];
-                }
-                return standardHeights[0];
+                if (h <= 2.01) return 2.0; if (h <= 2.20 || h === 2.21) return 2.2;
+                if (h <= 2.40 || h === 2.41) return 2.4; if (h <= 2.60 || h === 2.61) return 2.6;
+                if (h <= 2.80 || h === 2.81) return 2.8; if (h <= 3.00 || h === 3.01) return 3.0;
+                if (h <= 3.30 || h === 3.31) return 3.3; if (h <= 3.50 || h === 3.51) return 3.5;
+                if (h <= 3.70) return 3.7; return h;
             };
             
             const generatePdf = (title, columns, body, total, filename, extraInfo = []) => {
