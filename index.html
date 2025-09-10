@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Product Calculator (Split)</title>
+  <style>
+    body{font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto; margin:0; background:#f3f6fb;}
+    header{display:flex; align-items:center; gap:8px; padding:14px 18px; background:#0f172a; color:#fff;}
+    .brand{font-weight:700;}
+    nav{display:flex; gap:8px; padding:10px 12px; background:#e6eefc; position:sticky; top:0}
+    .nav-tab{border:0; padding:9px 12px; border-radius:8px; background:#fff; cursor:pointer}
+    .nav-tab.active{background:#2563eb; color:#fff}
+    main{padding:16px}
+    .card{background:#fff; padding:16px; border-radius:12px; box-shadow:0 6px 20px rgba(20,40,80,.07); max-width:980px; margin:auto}
+    .grid{display:grid}
+    .grid-12{grid-template-columns:repeat(12, minmax(0,1fr))}
+    .col-3{grid-column: span 3 / span 3}
+    .col-4{grid-column: span 4 / span 4}
+    .col-6{grid-column: span 6 / span 6}
+    .col-12{grid-column: span 12 / span 12}
+    input,select{width:100%; padding:10px; border:1px solid #c7d2fe; border-radius:10px; background:#f8fafc}
+    .btn{background:#2563eb; color:#fff; border:0; border-radius:10px; padding:10px 14px; cursor:pointer}
+    .btn-secondary{background:#10b981}
+    .btn-tertiary{background:#475569}
+    .btn-danger{background:#ef4444}
+    .total{font-weight:800; color:#065f46}
+    .muted{color:#64748b}
+    .row{display:flex; gap:8px; flex-wrap:wrap}
+    .mt-8{margin-top:8px} .mt-12{margin-top:12px}
+    .sticky-bar{position:sticky; bottom:0; padding:10px; background:#eef2ff; border-top:1px solid #c7d2fe; margin-top:12px}
+  </style>
+</head>
+<body>
+  <header><div class="brand">Product Calculator</div><div class="muted">— แยกไฟล์ต่อเมนู</div></header>
+  <nav>
+    <button class="nav-tab" data-page="alu">คำนวณมู่ลี่อลูมิเนียม</button>
+    <button class="nav-tab" data-page="air">คำนวณฉากกั้นแอร์</button>
+    <button class="nav-tab" data-page="wood">คำนวณมู่ลี่ไม้</button>
+    <button class="nav-tab" data-page="roller">คำนวณม่านม้วน</button>
+    <button class="nav-tab" data-page="rail">คำนวณรางม่าน</button>
+  </nav>
+  <main id="app"><div class="card">เลือกเมนูด้านบน</div></main>
+
+  <!-- Core + Data -->
+  <script>window.appConfig = window.appConfig || {};</script>
+  <script src="assets/js/core/quote-store.js"></script>
+  <script src="assets/js/core/pdf.js"></script>
+  <script src="assets/js/core/formulas.js"></script>
+  <script src="assets/js/core/sheets.js"></script>
+  <script src="assets/js/data/products.js"></script>
+
+  <!-- Page scripts (loaded up-front; เรียกผ่าน window.Pages.*.init) -->
+  <script src="assets/js/pages/alu.js"></script>
+  <script src="assets/js/pages/air.js"></script>
+  <script src="assets/js/pages/wood.js"></script>
+  <script src="assets/js/pages/roller.js"></script>
+  <script src="assets/js/pages/rail.js"></script>
+
+  <script src="assets/js/router.js"></script>
+</body>
+</html>
