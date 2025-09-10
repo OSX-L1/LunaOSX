@@ -1534,81 +1534,54 @@ doc.text('(_______________________________)', 20 + signatureSpacing * 2 + signat
         });
     </script>
 
-<!-- ===== Add-on: Unlimited rows + per-row codes + roller selectors + combined quote (isolated) ===== -->
+<!-- ===== Roller-only Fix: selectors + compute + add-to-combined ===== -->
 <script>
 (function(){
-  // Utility
-  const $ = (sel, root=document) => root.querySelector(sel);
-  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
-  const visiblePanel = () => {
-    const panels = $$('#page-roller, #page-pvc, #page-wood, #page-rail, #page-blinds');
-    return panels.find(p => p && p.offsetParent !== null) || document.body;
-  };
+  const $ = (s, r=document)=>r.querySelector(s);
+  const $$ = (s, r=document)=>Array.from(r.querySelectorAll(s));
 
-  // 1) Add "เพิ่มรายการ (ไม่จำกัด)" buttons for each known calculator panel
-  const map = [
-    {key:'pvc',   panel:'#page-pvc'},
-    {key:'wood',  panel:'#page-wood'},
-    {key:'rail',  panel:'#page-rail'},
-    {key:'roller',panel:'#page-roller'},
-    {key:'blinds',panel:'#page-blinds'},
-  ];
+  function getRollerPanel(){
+    return $('#page-roller') || document;
+  }
 
-  function ensureUnlimitedButton(key, panelSel){
-    const panel = $(panelSel);
-    if(!panel) return;
-    // Find an existing add button in the panel to copy style from
-    const anyAdd = panel.querySelector('button, .btn');
-    const btn = document.createElement('button');
-    btn.id = key+'AddUnlimited';
-    btn.className = (anyAdd && anyAdd.className) ? anyAdd.className : 'px-3 py-2 rounded border';
-    btn.textContent = 'เพิ่มรายการ (ไม่จำกัด)';
-    btn.style.marginLeft = '8px';
-    // place next to first button row
-    const targetBar = panel.querySelector('.flex, .toolbar, .actions, .mb-2, .mb-4') || panel;
-    targetBar.appendChild(btn);
-
-    btn.addEventListener('click', () => {
-      // Find rows container in this panel
-      const rows = panel.querySelectorAll('.calculation-row');
-      if(!rows.length){
-        alert('ยังไม่พบแถวตัวอย่างในหน้านี้');
-        return;
+  // --- Build mapping ---
+  function buildRollerMapping(){
+    // Preferred: from appConfig.prices.roller
+    try{
+      if(window.appConfig && appConfig.prices && appConfig.prices.roller){
+        return JSON.parse(JSON.stringify(appConfig.prices.roller));
       }
-      const last = rows[rows.length-1];
-      const clone = last.cloneNode(true);
-      // reset values
-      $$('input', clone).forEach(i => { if(i.type==='number' || i.type==='text') i.value=''; });
-      $$('select', clone).forEach(s => s.selectedIndex = 0);
-      // Re-number if there is a display
-      const no = rows.length + 1;
-      const orderLabel = clone.querySelector('.row-no, [data-no]');
-      if(orderLabel) orderLabel.textContent = String(no);
-      // insert
-      last.parentNode.appendChild(clone);
-      // decorate with per-row code/selectors if applicable
-      decorateRow(key, clone);
-    });
+    }catch(e){}
+    // Fallback: clone options from top dropdowns as current snapshot
+    const catSelTop = document.getElementById('rollerCategorySelect');
+    const typeSelTop = document.getElementById('rollerTypeSelect');
+    const codeSelTop = document.getElementById('rollerCodeSelect');
+    const map = {};
+    if(catSelTop && typeSelTop && codeSelTop){
+      const currentCat = catSelTop.value, currentType = typeSelTop.value;
+      // We can't iterate all combinations safely; take current snapshot so user at least can select within current category
+      const cat = currentCat || (catSelTop.options[0] && catSelTop.options[0].value) || 'Default';
+      map[cat] = {};
+      const types = Array.from(typeSelTop.options).map(o=>o.value).filter(Boolean);
+      const codes = Array.from(codeSelTop.options).map(o=>o.value).filter(Boolean);
+      (types.length?types:['']).forEach(t=>{
+        map[cat][t] = { price: Number($('#rollerPriceDisplay')?.textContent?.replace(/[^0-9.]/g,'')||0), codes: codes };
+      });
+      return map;
+    }
+    return null;
   }
 
-  // 2) Per-row "รหัสสินค้า" input for PVC/WOOD/RAIL/BLINDS
-  function injectCodeInput(row, cls){
-    if(row.querySelector('.'+cls)) return;
-    const box = document.createElement('div');
-    box.className = 'mb-2';
-    box.innerHTML = '<label class="block text-sm text-slate-600 mb-1">รหัสสินค้า (ต่อแถว)</label>' +
-                    '<input type="text" class="w-full p-2 border rounded-md '+cls+'" placeholder="ใส่รหัสสินค้า เช่น 930-10 / RSP501">';
-    const firstGrid = row.querySelector('.grid');
-    if(firstGrid) row.insertBefore(box, firstGrid);
-    else row.prepend(box);
+  function fillSelect(sel, list){
+    sel.innerHTML = '';
+    list.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o); });
   }
 
-  // 3) Roller per-row Category/Type/Code selects from appConfig.prices.roller
-  function injectRollerSelectors(row){
+  function injectRowSelectors(row){
     if(row.querySelector('.roller-row-category')) return;
-    const selects = document.createElement('div');
-    selects.className = 'grid grid-cols-1 md:grid-cols-6 gap-2 mb-2';
-    selects.innerHTML = `
+    const box = document.createElement('div');
+    box.className = 'grid grid-cols-1 md:grid-cols-6 gap-2 mb-2';
+    box.innerHTML = `
       <label class="text-sm text-slate-600 md:col-span-2">ประเภท
         <select class="w-full p-2 border rounded-md roller-row-category"></select>
       </label>
@@ -1619,160 +1592,157 @@ doc.text('(_______________________________)', 20 + signatureSpacing * 2 + signat
         <select class="w-full p-2 border rounded-md roller-row-code"></select>
       </label>`;
     const firstGrid = row.querySelector('.grid');
-    if(firstGrid) row.insertBefore(selects, firstGrid); else row.prepend(selects);
-    setupRollerRowSelects(row);
-  }
+    if(firstGrid) row.insertBefore(box, firstGrid); else row.prepend(box);
 
-  function setupRollerRowSelects(row){
-    try{
-      const roller = (window.appConfig && appConfig.prices && appConfig.prices.roller) ? appConfig.prices.roller : null;
-      if(!roller) return;
-      const catSel = row.querySelector('.roller-row-category');
-      const typeSel = row.querySelector('.roller-row-type');
-      const codeSel = row.querySelector('.roller-row-code');
-      const fill = (sel, items) => { sel.innerHTML=''; items.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o); }); };
-      fill(catSel, Object.keys(roller));
-      const updateType = ()=>{ const c=catSel.value; fill(typeSel, c && roller[c]? Object.keys(roller[c]) : []); updateCode(); };
-      const updateCode = ()=>{ const c=catSel.value, t=typeSel.value; const codes=(c&&t&&roller[c]&&roller[c][t]&&roller[c][t].codes)||[]; fill(codeSel, codes); };
-      catSel.onchange = updateType;
-      typeSel.onchange = updateCode;
-      updateType();
-    }catch(e){ console.warn('setupRollerRowSelects error', e); }
-  }
+    const map = buildRollerMapping();
+    const catSel = box.querySelector('.roller-row-category');
+    const typeSel = box.querySelector('.roller-row-type');
+    const codeSel = box.querySelector('.roller-row-code');
 
-  // 4) Decorate an existing row depending on category
-  function decorateRow(kind, row){
-    if(kind==='roller') injectRollerSelectors(row);
-    else if(kind==='pvc') injectCodeInput(row, 'pvc-item-code');
-    else if(kind==='wood') injectCodeInput(row, 'wood-item-code');
-    else if(kind==='rail') injectCodeInput(row, 'rail-item-code');
-    else if(kind==='blinds') injectCodeInput(row, 'blinds-item-code');
-  }
-
-  // 5) First-time decoration for first rows
-  function decorateInitial(){
-    map.forEach(({key, panel})=>{
-      const panelEl = $(panel); if(!panelEl) return;
-      ensureUnlimitedButton(key, panel);
-      $$('.calculation-row', panelEl).forEach(r => decorateRow(key, r));
-    });
-  }
-
-  // 6) Combined quote UI (floating)
-  function ensureCombinedUI(){
-    if($('#combined-quote-bar')) return;
-    const bar = document.createElement('div');
-    bar.id = 'combined-quote-bar';
-    bar.style.cssText = 'position:fixed; right:16px; bottom:16px; z-index:9999; display:flex; gap:8px;';
-    bar.innerHTML = `
-      <button id="combinedViewBtn" class="bg-slate-700 text-white px-3 py-2 rounded-lg shadow">รายการรวม (0)</button>
-      <button id="combinedPdfBtn" class="bg-blue-600 text-white px-3 py-2 rounded-lg shadow" disabled>สร้าง PDF รวม</button>`;
-    document.body.appendChild(bar);
-
-    const modal = document.createElement('div');
-    modal.id = 'combinedModal';
-    modal.style.cssText = 'display:none; position:fixed; inset:0; background:rgba(0,0,0,.25); align-items:center; justify-content:center; z-index:10000;';
-    modal.innerHTML = `<div style="background:#fff; border-radius:12px; width:min(920px,92vw); max-height:80vh; overflow:auto; padding:16px;">
-      <div class="flex justify-between items-center mb-2">
-        <h3 class="text-lg font-bold">รายการใบเสนอราคารวม</h3>
-        <button id="combinedCloseBtn" class="px-2 py-1 rounded border">ปิด</button>
-      </div>
-      <div id="combinedTable"></div>
-    </div>`;
-    document.body.appendChild(modal);
-
-    window.combinedItems = window.combinedItems || [];
-
-    function renderCombined(){
-      const tbl = $('#combinedTable');
-      const btn = $('#combinedViewBtn');
-      if(btn) btn.textContent = `รายการรวม (${window.combinedItems.length})`;
-      if(!tbl) return;
-      if(window.combinedItems.length===0){ tbl.innerHTML = '<p class="text-slate-500">ยังไม่มีรายการ</p>'; return; }
-      const rows = window.combinedItems.map((i,idx)=>`<tr>
-        <td class="p-1">${idx+1}</td>
-        <td class="p-1">${i.category||'-'}</td>
-        <td class="p-1">${i.type||'-'}</td>
-        <td class="p-1">${i.code||'-'}</td>
-        <td class="p-1">${i.width} x ${i.height}</td>
-        <td class="p-1">${i.adjust||'-'}</td>
-        <td class="p-1">${i.qty}</td>
-        <td class="p-1 text-right">${Number(i.itemCost||0).toLocaleString('en-US',{minimumFractionDigits:2})}</td>
-      </tr>`).join('');
-      tbl.innerHTML = `<div class="overflow-x-auto"><table class="min-w-full text-sm">
-        <thead><tr>
-          <th class="p-1 text-left">#</th>
-          <th class="p-1 text-left">ประเภทสินค้า</th>
-          <th class="p-1 text-left">รุ่น</th>
-          <th class="p-1 text-left">รหัส</th>
-          <th class="p-1 text-left">ขนาด (ซม.)</th>
-          <th class="p-1 text-left">การปรับ</th>
-          <th class="p-1 text-left">จำนวน</th>
-          <th class="p-1 text-right">ราคารวม (บาท)</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table></div>`;
-    }
-
-    $('#combinedViewBtn').onclick = ()=>{ $('#combinedModal').style.display='flex'; renderCombined(); };
-    $('#combinedCloseBtn').onclick = ()=>{ $('#combinedModal').style.display='none'; };
-    $('#combinedPdfBtn').onclick = ()=>{
-      if(!window.combinedItems.length) return;
-      const columns = ["ลำดับ","ประเภทสินค้า","รุ่น","รหัส","ขนาด (ซม.)","การปรับ","จำนวน","ราคารวม (บาท)"];
-      const rows = window.combinedItems.map((i,idx)=>[idx+1, i.category||'-', i.type||'-', i.code||'-', `${i.width} x ${i.height}`, i.adjust||'-', i.qty, Number(i.itemCost||0).toLocaleString('en-US',{minimumFractionDigits:2})]);
-      const total = window.combinedItems.reduce((a,b)=>a+Number(b.itemCost||0),0);
-      if(typeof showPdfPreview==='function') showPdfPreview('ใบเสนอราคา (รวมหลายรายการ/หลายประเภท)', columns, rows, total, 'ใบเสนอราคา-รวม.pdf', []);
-      else alert('ไม่พบตัวสร้าง PDF');
+    const categories = map ? Object.keys(map) : [];
+    fillSelect(catSel, categories.length?categories:['']);
+    const updateType = ()=>{
+      const c = catSel.value;
+      const types = (map && map[c]) ? Object.keys(map[c]) : [];
+      fillSelect(typeSel, types.length?types:['']);
+      updateCode();
+    };
+    const updateCode = ()=>{
+      const c = catSel.value, t = typeSel.value;
+      const codes = (map && map[c] && map[c][t]) ? (map[c][t].codes||[]) : [];
+      fillSelect(codeSel, codes.length?codes:['']);
     };
 
-    window.addCalculatedToCombined = function(kind, data){
-      try{
-        if(!data || !data.items || !data.items.length){ alert('ยังไม่มีรายการที่คำนวณ'); return; }
-        const toPush = data.items.map(it => ({
-          category: kind,
-          type: it.type || data.type || '',
-          code: it.code || data.code || '',
-          width: it.width, height: it.height, qty: it.qty, adjust: it.adjust, itemCost: it.itemCost
-        }));
-        window.combinedItems = window.combinedItems.concat(toPush);
-        $('#combinedPdfBtn').disabled = window.combinedItems.length===0;
-        renderCombined();
-        alert('เพิ่มลงใบเสนอราคารวมแล้ว');
-      }catch(e){ console.warn('addCalculatedToCombined failed', e); }
+    catSel.addEventListener('change', updateType);
+    typeSel.addEventListener('change', updateCode);
+    updateType();
+  }
+
+  // Decorate existing rows once
+  function decorateExisting(){
+    const panel = getRollerPanel();
+    $$('.calculation-row', panel).forEach(injectRowSelectors);
+  }
+
+  // Observe new rows being added
+  const observer = new MutationObserver(muts => {
+    muts.forEach(m => {
+      m.addedNodes && m.addedNodes.forEach(node => {
+        if(node.nodeType===1 && node.classList.contains('calculation-row')){
+          injectRowSelectors(node);
+        }
+      });
+    });
+  });
+  const rowsWrap = $('#page-roller .rows, #rollerRows, #roller-rows, #page-roller');
+  if(rowsWrap) observer.observe(rowsWrap, {childList:true, subtree:true});
+
+  // --- Compute Roller result and expose window.rollerCalculatedData ---
+  function normalizeToMeters(v){
+    const n = parseFloat(String(v).replace(/[^0-9.]/g,''));
+    if(isNaN(n)) return 0;
+    // Assume inputs are in centimeters if >= 10
+    return n / 100;
+  }
+
+  function getRowPrice(map, cat, typ){
+    if(map && map[cat] && map[cat][typ] && map[cat][typ].price) return Number(map[cat][typ].price);
+    // fallback from top price display
+    const topPrice = document.querySelector('#rollerPriceDisplay, #priceDisplay, .price-display');
+    if(topPrice){ const n = parseFloat(topPrice.textContent.replace(/[^0-9.]/g,'')); if(!isNaN(n)) return n; }
+    return 0;
+  }
+
+  function computeRoller(){
+    const panel = getRollerPanel();
+    const map = buildRollerMapping();
+    const rows = $$('.calculation-row', panel);
+    if(!rows.length){ alert('กรุณาเพิ่มรายการอย่างน้อย 1 รายการ'); return; }
+    let total = 0;
+    const items = [];
+    let ok = true;
+
+    rows.forEach((row, idx)=>{
+      const catSel = $('.roller-row-category', row);
+      const typeSel = $('.roller-row-type', row);
+      const codeSel = $('.roller-row-code', row);
+      const wEl = $('.roller-width,[name*="width"]', row);
+      const hEl = $('.roller-height,[name*="height"]', row);
+      const qEl = $('.roller-qty,[name*="qty"],[name*="quantity"]', row);
+      const adjSel = $('.roller-adjust, select[name*="adjust"]', row);
+
+      const cat = catSel && catSel.value || '';
+      const typ = typeSel && typeSel.value || '';
+      const code = codeSel && codeSel.value || '';
+      const w = wEl && wEl.value;
+      const h = hEl && hEl.value;
+      const qty = qEl && parseInt(qEl.value,10) || 0;
+      const adjust = adjSel && adjSel.value || '';
+
+      if(!w || !h || !qty){ ok = false; return; }
+      const price = getRowPrice(map, cat, typ);
+      const itemCost = normalizeToMeters(w) * normalizeToMeters(h) * 1.2 * price * qty;
+      total += itemCost;
+      items.push({ no: idx+1, category: cat, type: typ, code: code, width: w, height: h, qty: qty, adjust: adjust, itemCost });
+    });
+
+    if(!ok){ alert('กรุณากรอกข้อมูลให้ครบในทุกแถว'); return; }
+
+    window.rollerCalculatedData = { items, totalCost: total };
+    // enable combined button if available
+    const addBtn = document.getElementById('rollerAddCombinedBtn');
+    if(addBtn) addBtn.disabled = false;
+    return window.rollerCalculatedData;
+  }
+
+  // Wire our compute after the page's own calculate button runs
+  function wireCalculateButton(){
+    const panel = getRollerPanel();
+    const calcBtn = $('#rollerCalculateBtn, #page-roller button[type="button"].calculate, #page-roller button, #rollerCalculate');
+    if(calcBtn && !calcBtn._patched){
+      calcBtn.addEventListener('click', ()=> setTimeout(computeRoller, 0));
+      calcBtn._patched = true;
     }
   }
 
-  // 7) Attach "เพิ่มลงใบเสนอราคารวม" to each panel near existing PDF button (if any)
-  function attachAddCombinedButtons(){
-    [['pvc','#page-pvc','#pvcPdfBtn'],
-     ['wood','#page-wood','#woodPdfBtn'],
-     ['rail','#page-rail','#railPdfBtn'],
-     ['roller','#page-roller','#rollerPdfBtn'],
-     ['blinds','#page-blinds','#blindsPdfBtn']].forEach(([key,panelSel,btnSel])=>{
-      const panel = $(panelSel); if(!panel) return;
-      const pdfBtn = $(btnSel); if(!pdfBtn) return;
+  // Inject "เพิ่มลงใบเสนอราคารวม" next to PDF
+  function wireAddCombined(){
+    const pdfBtn = document.getElementById('rollerPdfBtn') || $('#page-roller .pdf-btn, #page-roller button');
+    if(pdfBtn && !document.getElementById('rollerAddCombinedBtn')){
       const addBtn = document.createElement('button');
+      addBtn.id = 'rollerAddCombinedBtn';
       addBtn.className = pdfBtn.className || 'px-3 py-2 rounded border';
-      addBtn.style.marginLeft = '8px';
       addBtn.textContent = 'เพิ่มลงใบเสนอราคารวม';
+      addBtn.style.marginLeft = '8px';
+      addBtn.disabled = true;
       pdfBtn.insertAdjacentElement('afterend', addBtn);
-      addBtn.onclick = ()=>{
-        const data = window[key+'CalculatedData'];
-        window.addCalculatedToCombined(key, data);
+      addBtn.onclick = function(){
+        if(!window.combinedItems) window.combinedItems = [];
+        if(!window.rollerCalculatedData){ const d = computeRoller(); if(!d) return; }
+        const d = window.rollerCalculatedData;
+        if(!d || !d.items || !d.items.length){ alert('ยังไม่มีรายการที่คำนวณ'); return; }
+        window.combinedItems = window.combinedItems.concat(d.items.map(it => ({
+          category: 'ม่านม้วน', type: it.type, code: it.code,
+          width: it.width, height: it.height, qty: it.qty, adjust: it.adjust, itemCost: it.itemCost
+        })));
+        // show combined bar if my addon created it
+        const bar = document.getElementById('combined-quote-bar');
+        if(bar){ const viewBtn = document.getElementById('combinedViewBtn'); if(viewBtn) viewBtn.textContent = `รายการรวม (${window.combinedItems.length})`; const pdfC = document.getElementById('combinedPdfBtn'); if(pdfC) pdfC.disabled = window.combinedItems.length===0; }
+        alert('เพิ่มลงใบเสนอราคารวมแล้ว');
       };
-    });
+    }
   }
 
-  function start(){
+  function init(){
     try{
-      decorateInitial();
-      ensureCombinedUI();
-      attachAddCombinedButtons();
-    }catch(e){ console.error('addon init error', e); }
+      decorateExisting();
+      wireCalculateButton();
+      wireAddCombined();
+    }catch(e){ console.error('roller-fix init error', e); }
   }
-
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
-  else start();
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  // Also try again after 1s in case DOM is late
+  setTimeout(init, 1200);
 })();
 </script>
 
