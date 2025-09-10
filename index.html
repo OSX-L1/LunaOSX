@@ -302,10 +302,32 @@
 
             const addPvcRow = () => {
                 const container = document.getElementById('pvc-rows-container');
-                pvcRowCount++; const rowId = `pvc-row-${pvcRowCount}`;
+                pvcRowCount++;
+                /* limit removed */
+                const rowId = `pvc-row-${pvcRowCount}`;
                 const rowHtml = `<div id="${rowId}" class="calculation-row grid grid-cols-12 gap-2 items-center"><span class="col-span-1 text-center text-slate-500">${pvcRowCount}.</span><input type="number" step="any" placeholder="กว้าง (ซม.)" class="w-full p-2 border rounded-md col-span-3"><input type="number" step="any" placeholder="สูง (ซม.)" class="w-full p-2 border rounded-md col-span-3"><input type="number" value="1" placeholder="จำนวน" class="w-full p-2 border rounded-md col-span-3"><button data-row-id="${rowId}" class="remove-row-btn col-span-2 text-red-500 hover:text-red-700 font-bold">ลบ</button></div>`;
                 container.insertAdjacentHTML('beforeend', rowHtml);
                 container.querySelector(`button[data-row-id="${rowId}"]`).addEventListener('click', (e) => {
+                    try{
+                        var newRow = document.getElementById(rowId);
+                        if(newRow && !newRow.querySelector('.roller-code-select')){
+                            var holder = document.createElement('div');
+                            holder.className = 'grid grid-cols-1 md:grid-cols-4 gap-2';
+                            holder.innerHTML = '<div class="md:col-span-2">'+
+                                '<label class="block text-sm font-medium text-slate-600 mb-1">รหัสสินค้า (ต่อแถว)</label>'+
+                                '<select class="roller-code-select w-full p-2 border rounded-md"><option value="">เลือกรหัสสินค้า (ต่อแถว)</option></select>'+
+                                '</div>';
+                            var grids = newRow.querySelectorAll('.grid');
+                            var target = grids.length ? grids[grids.length-1].parentNode : newRow;
+                            target.appendChild(holder);
+                            var sel = holder.querySelector('.roller-code-select');
+                            var allCodes = (window.rollerAllCodes||[]);
+                            if(sel && allCodes.length){
+                                sel.innerHTML = '<option value=\"\">เลือกรหัสสินค้า (ต่อแถว)</option>'+ allCodes.map(function(c){ return '<option value=\"'+c+'\">'+c+'</option>'; }).join('');
+                            }
+                        }
+                    }catch(_e){}
+    
                     e.target.closest('.calculation-row').remove();
                     pvcRowCount = container.querySelectorAll('.calculation-row').length;
                      container.querySelectorAll('.calculation-row').forEach((row, index) => {
@@ -317,6 +339,7 @@
             const addWoodRow = () => {
                 const container = document.getElementById('wood-rows-container');
                 let rowCounter = container.querySelectorAll('.calculation-row').length;
+                /* limit removed */
                 rowCounter++;
                 const rowId = `wood-row-${rowCounter}`;
                 const rowHtml = `
@@ -347,6 +370,7 @@
             const addRollerRow = () => {
                 const container = document.getElementById('roller-rows-container');
                 let rowCounter = container.querySelectorAll('.calculation-row').length;
+                /* limit removed */
                 rowCounter++;
                 const rowId = `roller-row-${rowCounter}`;
                 const rowHtml = `
@@ -366,30 +390,7 @@
                         </div>
                     </div>`;
                 container.insertAdjacentHTML('beforeend', rowHtml);
-                
-        try{
-            const newRow = document.getElementById(rowId);
-            if(newRow && !newRow.querySelector('.roller-code-select')){
-                const holder = document.createElement('div');
-                holder.className = 'grid grid-cols-1 md:grid-cols-4 gap-2';
-                holder.innerHTML = `
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-slate-600 mb-1">รหัสสินค้า (ต่อแถว)</label>
-                        <select class="roller-code-select w-full p-2 border rounded-md">
-                            <option value="">เลือกรหัสสินค้า (ตามรหัสจะใช้ราคาของรหัสดังกล่าว)</option>
-                        </select>
-                    </div>`;
-                const grids = newRow.querySelectorAll('.grid');
-                const target = grids[grids.length-1] ? grids[grids.length-1].parentNode : newRow;
-                target.appendChild(holder);
-                const sel = holder.querySelector('.roller-code-select');
-                const allCodes = window.rollerAllCodes||[];
-                if(sel && allCodes.length){
-                    sel.innerHTML = '<option value=\"\">เลือกรหัสสินค้า (ต่อแถว)</option>' + allCodes.map(c=>`<option value="${c}">${c}</option>`).join('');
-                }
-            }
-        }catch(_e){}
-    container.querySelector(`button[data-row-id="${rowId}"]`).addEventListener('click', (e) => {
+                container.querySelector(`button[data-row-id="${rowId}"]`).addEventListener('click', (e) => {
                     e.target.closest('.calculation-row').remove();
                     container.querySelectorAll('.calculation-row').forEach((row, index) => {
                         row.querySelector('.font-bold').textContent = `รายการที่ ${index + 1}`;
@@ -399,7 +400,9 @@
             
             const addRailRow = () => {
                 const container = document.getElementById('rail-rows-container');
-                let currentRowCount = container.querySelectorAll('.calculation-row').length; currentRowCount++;
+                let currentRowCount = container.querySelectorAll('.calculation-row').length;
+                /* limit removed */
+                currentRowCount++;
                 const rowHtml = `
                     <div class="calculation-row p-4 border rounded-lg space-y-3 bg-slate-50">
                         <div class="flex justify-between items-center">
@@ -665,7 +668,7 @@ doc.text('(_______________________________)', 20 + signatureSpacing * 2 + signat
                     const calcHeight = calculatePvcHeight(heightInMeters);
                     const itemCost = calcWidth * calcHeight * 1.2 * price * qty;
                     totalCost += itemCost;
-                    itemsForPdf.push({ code: (itemCode || topCode || ''), no: index + 1, width: originalWidth, height: originalHeight, qty, calcWidth, calcHeight, itemCost });
+                    itemsForPdf.push({ no: index + 1, width: originalWidth, height: originalHeight, qty, calcWidth, calcHeight, itemCost });
                 });
                 if (!allRowsValid) { errorDiv.textContent = 'กรุณากรอกข้อมูลในทุกช่องให้ถูกต้อง'; return null; }
                 const priceText = priceSelect.options[priceSelect.selectedIndex].text;
@@ -712,7 +715,16 @@ doc.text('(_______________________________)', 20 + signatureSpacing * 2 + signat
                     const qty = parseInt(qtyInput.value, 10);
                     const adjust = adjustSelect.value;
                     
-                    if([originalWidth, originalHeight, qty].some(isNaN) || [originalWidth, originalHeight, qty].some(v => v <= 0)) {
+                    
+                    var codeSelectEl = row.querySelector('.roller-code-select');
+                    var itemCode = codeSelectEl && codeSelectEl.value ? codeSelectEl.value : '';
+                    var rowPrice = price;
+                    if(itemCode && window.rollerCodePriceMap && window.rollerCodePriceMap[itemCode]){
+                        rowPrice = Number(window.rollerCodePriceMap[itemCode]) || price;
+                    }else if(topCode && window.rollerCodePriceMap && window.rollerCodePriceMap[topCode]){
+                        rowPrice = Number(window.rollerCodePriceMap[topCode]) || price;
+                    }
+    if([originalWidth, originalHeight, qty].some(isNaN) || [originalWidth, originalHeight, qty].some(v => v <= 0)) {
                         [widthInput, heightInput, qtyInput].forEach(i => {
                             if (isNaN(parseFloat(i.value)) || parseFloat(i.value) <= 0) {
                                 i.classList.add('border-red-500');
@@ -828,9 +840,9 @@ doc.text('(_______________________________)', 20 + signatureSpacing * 2 + signat
                 const price = parseFloat(priceText);
                 
                 
-            const topCodeSel = document.getElementById('rollerCodeSelect');
-            const topCode = topCodeSel ? topCodeSel.value : '';
-        if (isNaN(price) || price <= 0) {
+                var topCodeSel = document.getElementById('rollerCodeSelect');
+                var topCode = topCodeSel ? topCodeSel.value : '';
+    if (isNaN(price) || price <= 0) {
                     errorDiv.textContent = 'กรุณาเลือกรุ่นสินค้าที่มีราคาถูกต้อง';
                     return;
                 }
@@ -849,16 +861,7 @@ doc.text('(_______________________________)', 20 + signatureSpacing * 2 + signat
                     const qtyInput = row.querySelector('.roller-qty');
                     const adjustSelect = row.querySelector('.roller-adjust');
                     
-                    
-                const codeSelect = row.querySelector('.roller-code-select');
-                const itemCode = codeSelect && codeSelect.value ? codeSelect.value : '';
-                let rowPrice = price;
-                if(itemCode && window.rollerCodePriceMap && window.rollerCodePriceMap[itemCode]){
-                    rowPrice = Number(window.rollerCodePriceMap[itemCode]) || price;
-                } else if(topCode && window.rollerCodePriceMap && window.rollerCodePriceMap[topCode]){
-                    rowPrice = Number(window.rollerCodePriceMap[topCode]) || price;
-                }
-        [widthInput, heightInput, qtyInput].forEach(i => i.classList.remove('border-red-500'));
+                    [widthInput, heightInput, qtyInput].forEach(i => i.classList.remove('border-red-500'));
 
                     const originalWidth = parseFloat(widthInput.value);
                     const originalHeight = parseFloat(heightInput.value);
@@ -879,7 +882,7 @@ doc.text('(_______________________________)', 20 + signatureSpacing * 2 + signat
                     const heightInMeters = normalizeToMeters(originalHeight);
                     const itemCost = widthInMeters * heightInMeters * 1.2 * rowPrice * qty;
                     totalCost += itemCost;
-                    itemsForPdf.push({ no: index + 1, width: originalWidth, height: originalHeight, qty: qty, adjust: adjust, itemCost: itemCost });
+                    itemsForPdf.push({ code: (itemCode || topCode || ''), no: index + 1, width: originalWidth, height: originalHeight, qty: qty, adjust: adjust, itemCost: itemCost });
                 });
 
                 if (!allRowsValid) {
@@ -951,22 +954,22 @@ doc.text('(_______________________________)', 20 + signatureSpacing * 2 + signat
                         updatePriceAndCodes();
                         return;
                     };
-            (function(){
-                try{
-                    const map = {}; const list = [];
-                    Object.keys(rollerData).forEach(cat => {
-                        const types = rollerData[cat]||{};
-                        Object.keys(types).forEach(t => {
-                            const info = types[t]||{};
-                            const price = Number(info.price)||0;
-                            (info.codes||[]).forEach(cd => { if(cd){ map[cd]=price; list.push(cd); } });
+                (function(){
+                    try{
+                        var map = {}, list = [];
+                        Object.keys(rollerData).forEach(function(cat){
+                            var types = rollerData[cat]||{};
+                            Object.keys(types).forEach(function(t){
+                                var info = types[t]||{};
+                                var price = Number(info.price)||0;
+                                (info.codes||[]).forEach(function(cd){ if(cd){ map[cd]=price; list.push(cd); } });
+                            });
                         });
-                    });
-                    window.rollerCodePriceMap = map;
-                    window.rollerAllCodes = Array.from(new Set(list)).sort();
-                }catch(e){ console.warn('build roller codes failed', e); }
-            })();
-        
+                        window.rollerCodePriceMap = map;
+                        window.rollerAllCodes = Array.from(new Set(list)).sort();
+                    }catch(e){ console.warn('build roller code map failed', e); }
+                })();
+    
                     
                     Object.keys(rollerData[selectedCategory]).forEach(type => {
                         const option = document.createElement('option');
@@ -1329,7 +1332,7 @@ doc.text('(_______________________________)', 20 + signatureSpacing * 2 + signat
                     break;
                 case 'roller':
                     columns = [\"ลำดับ\", \"รหัสสินค้า\", \"ขนาด (ซม.)\", \"การปรับ\", \"จำนวน\", \"ราคารวม (บาท)\"];
-                    rows = quote.data.items.map(item => [ item.no, (item.code||''), `${item.width} x ${item.height}`, item.adjust, item.qty, item.itemCost.toLocaleString('en-US', {minimumFractionDigits: 2})]);
+                    rows = quote.data.items.map(item => [ item.no, (item.code||quote.data.code||''), `${item.width} x ${item.height}`, item.adjust, item.qty, item.itemCost.toLocaleString('en-US', {minimumFractionDigits: 2})]);
                     extraInfo = [
                         {label: 'ประเภท', value: quote.data.category}, 
                         {label: 'รุ่นสินค้า', value: quote.data.type},
@@ -1546,7 +1549,7 @@ doc.text('(_______________________________)', 20 + signatureSpacing * 2 + signat
             document.getElementById('rollerPdfBtn').addEventListener('click', () => {
                 const data = rollerCalculatedData; if(!data) return;
                 const columns = [\"ลำดับ\", \"รหัสสินค้า\", \"ขนาด (ซม.)\", \"การปรับ\", \"จำนวน\", \"ราคารวม (บาท)\"];
-                const rows = data.items.map(item => [ item.no, (item.code||''), `${item.width} x ${item.height}`, item.adjust, item.qty, item.itemCost.toLocaleString('en-US', {minimumFractionDigits: 2})]);
+                const rows = data.items.map(item => [ item.no, (item.code||data.code||''), `${item.width} x ${item.height}`, item.adjust, item.qty, item.itemCost.toLocaleString('en-US', {minimumFractionDigits: 2})]);
                 const extraInfo = [
                     {label: 'ประเภท', value: data.category}, 
                     {label: 'รุ่นสินค้า', value: data.type},
@@ -1578,51 +1581,5 @@ doc.text('(_______________________________)', 20 + signatureSpacing * 2 + signat
             addRollerRow();
         });
     </script>
-
-<!-- ===== Runtime Safety Shim (non-invasive) ===== -->
-<script>
-(function(){
-  // Global error overlay so the app won't look blank without a hint
-  var overlay;
-  window.addEventListener('error', function(ev){
-    try{
-      if(overlay) return;
-      overlay = document.createElement('div');
-      overlay.style.cssText = 'position:fixed;left:0;right:0;bottom:0;background:#fee2e2;color:#7f1d1d;padding:10px 14px;font:12px/1.4 system-ui, -apple-system, Segoe UI, Roboto;z-index:2147483647;box-shadow:0 -2px 8px rgba(0,0,0,.1)';
-      overlay.textContent = 'เกิดข้อผิดพลาดของสคริปต์: ' + (ev.message || ev.error || 'Unknown error');
-      var btn = document.createElement('button');
-      btn.textContent = 'ดูรายละเอียดใน Console';
-      btn.style.cssText = 'margin-left:12px;padding:4px 8px;border:1px solid #ef4444;background:#fff;border-radius:6px;cursor:pointer';
-      btn.onclick = function(){ alert('กด F12 → Console เพื่อดูรายละเอียดข้อผิดพลาด'); };
-      overlay.appendChild(btn);
-      document.body.appendChild(overlay);
-      console.error('GLOBAL ERROR:', ev.error || ev.message, ev);
-    }catch(_e){}
-  }, true);
-
-  document.addEventListener('DOMContentLoaded', function(){
-    try{
-      // ถ้ามีฟังก์ชัน populate ของแต่ละหมวดให้เรียกอย่างปลอดภัย
-      if (typeof populateRollerDropdowns === 'function') try{ populateRollerDropdowns(); }catch(e){ console.warn('populateRollerDropdowns error', e); }
-      if (typeof populatePvcDropdowns === 'function')    try{ populatePvcDropdowns(); }catch(e){ console.warn('populatePvcDropdowns error', e); }
-      if (typeof populateWoodDropdowns === 'function')   try{ populateWoodDropdowns(); }catch(e){ console.warn('populateWoodDropdowns error', e); }
-      if (typeof populateRailDropdowns === 'function')   try{ populateRailDropdowns(); }catch(e){ console.warn('populateRailDropdowns error', e); }
-      if (typeof populateBlindsDropdowns === 'function') try{ populateBlindsDropdowns(); }catch(e){ console.warn('populateBlindsDropdowns error', e); }
-
-      // ถ้ายังไม่มีอะไรแสดง ให้พยายามเลือกแท็บแรกอัตโนมัติ
-      try{
-        var panels = document.querySelectorAll('[data-panel], .panel, .calculator-section');
-        var anyVisible = false;
-        panels.forEach(function(p){ var s = getComputedStyle(p); if (s.display !== 'none' && s.visibility !== 'hidden' && p.offsetHeight>0) anyVisible = true; });
-        if(!anyVisible){
-          var firstNav = document.querySelector('[data-page], [data-target], .nav-btn, .menu-item, .tab-link');
-          if(firstNav && typeof firstNav.click === 'function'){ firstNav.click(); }
-        }
-      }catch(e){ console.warn('fallback show first tab failed', e); }
-    }catch(e){ console.warn('shim init failed', e); }
-  });
-})();
-</script>
-
 </body>
 </html>
