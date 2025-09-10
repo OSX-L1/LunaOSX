@@ -307,23 +307,7 @@
                 const rowId = `pvc-row-${pvcRowCount}`;
                 const rowHtml = `<div id="${rowId}" class="calculation-row grid grid-cols-12 gap-2 items-center"><span class="col-span-1 text-center text-slate-500">${pvcRowCount}.</span><input type="number" step="any" placeholder="กว้าง (ซม.)" class="w-full p-2 border rounded-md col-span-3"><input type="number" step="any" placeholder="สูง (ซม.)" class="w-full p-2 border rounded-md col-span-3"><input type="number" value="1" placeholder="จำนวน" class="w-full p-2 border rounded-md col-span-3"><button data-row-id="${rowId}" class="remove-row-btn col-span-2 text-red-500 hover:text-red-700 font-bold">ลบ</button></div>`;
                 container.insertAdjacentHTML('beforeend', rowHtml);
-                
-                const newRowEl = container.querySelector(`#${rowId}`);
-                const selectsBlock = document.createElement('div');
-                selectsBlock.className = 'grid grid-cols-1 md:grid-cols-3 gap-2';
-                selectsBlock.innerHTML = `
-                    <select class="w-full p-2 border rounded-md roller-row-category"></select>
-                    <select class="w-full p-2 border rounded-md roller-row-type"></select>
-                    <select class="w-full p-2 border rounded-md roller-row-code"></select>
-                `;
-                const firstGrid = newRowEl.querySelector('.grid');
-                if (firstGrid) {
-                    newRowEl.insertBefore(selectsBlock, firstGrid);
-                } else {
-                    newRowEl.appendChild(selectsBlock);
-                }
-                setupRollerRowSelects(newRowEl);
-container.querySelector(`button[data-row-id="${rowId}"]`).addEventListener('click', (e) => {
+                container.querySelector(`button[data-row-id="${rowId}"]`).addEventListener('click', (e) => {
                     e.target.closest('.calculation-row').remove();
                     pvcRowCount = container.querySelectorAll('.calculation-row').length;
                      container.querySelectorAll('.calculation-row').forEach((row, index) => {
@@ -335,7 +319,7 @@ container.querySelector(`button[data-row-id="${rowId}"]`).addEventListener('clic
             const addWoodRow = () => {
                 const container = document.getElementById('wood-rows-container');
                 let rowCounter = container.querySelectorAll('.calculation-row').length;
-                
+                if (rowCounter >= 10) { alert('สามารถเพิ่มได้สูงสุด 10 รายการ'); return; }
                 rowCounter++;
                 const rowId = `wood-row-${rowCounter}`;
                 const rowHtml = `
@@ -364,69 +348,57 @@ container.querySelector(`button[data-row-id="${rowId}"]`).addEventListener('clic
             };
 
             
+// === [PATCH] Roller: per-row selectors + data binding (Category/Type/Code) ===
 const setupRollerRowSelects = (row) => {
-    try {
-        const rollerData = (appConfig && appConfig.prices && appConfig.prices.roller) ? appConfig.prices.roller : {};
-        const catSel = row.querySelector('.roller-row-category');
-        const typeSel = row.querySelector('.roller-row-type');
-        const codeSel = row.querySelector('.roller-row-code');
-        if(!catSel || !typeSel || !codeSel) return;
+  try {
+    const rollerData = (window.appConfig && appConfig.prices && appConfig.prices.roller) ? appConfig.prices.roller : {};
+    const catSel = row.querySelector('.roller-row-category');
+    const typeSel = row.querySelector('.roller-row-type');
+    const codeSel = row.querySelector('.roller-row-code');
+    if(!catSel || !typeSel || !codeSel) return;
 
-        const populateTypes = () => {
-            typeSel.innerHTML = '';
-            const cat = catSel.value;
-            if(!rollerData[cat]) { codeSel.innerHTML = '<option>N/A</option>'; return; }
-            Object.keys(rollerData[cat]).forEach(t => {
-                const o = document.createElement('option');
-                o.value = t; o.textContent = t; typeSel.appendChild(o);
-            });
-            populateCodes();
-        };
+    const populateTypes = () => {
+      typeSel.innerHTML = '';
+      const cat = catSel.value;
+      if(!rollerData[cat]) { codeSel.innerHTML = '<option value="">-</option>'; return; }
+      Object.keys(rollerData[cat]).forEach(t => {
+        const o = document.createElement('option'); o.value = t; o.textContent = t; typeSel.appendChild(o);
+      });
+      populateCodes();
+    };
 
-        const populateCodes = () => {
-            codeSel.innerHTML = '';
-            const cat = catSel.value;
-            const typ = typeSel.value;
-            if(!rollerData[cat] || !rollerData[cat][typ]) { codeSel.innerHTML = '<option>N/A</option>'; return; }
-            const info = rollerData[cat][typ];
-            (info.codes || []).forEach(code => {
-                const o = document.createElement('option');
-                o.value = code; o.textContent = code; codeSel.appendChild(o);
-            });
-        };
+    const populateCodes = () => {
+      codeSel.innerHTML = '';
+      const cat = catSel.value;
+      const typ = typeSel.value;
+      if(!rollerData[cat] || !rollerData[cat][typ]) { codeSel.innerHTML = '<option value="">-</option>'; return; }
+      const info = rollerData[cat][typ];
+      (info.codes || []).forEach(code => {
+        const o = document.createElement('option'); o.value = code; o.textContent = code; codeSel.appendChild(o);
+      });
+    };
 
-        // categories
-        catSel.innerHTML = '';
-        Object.keys(rollerData || {}).forEach(cat => {
-            const o = document.createElement('option');
-            o.value = cat; o.textContent = cat; catSel.appendChild(o);
-        });
+    // categories
+    catSel.innerHTML = '';
+    Object.keys(rollerData || {}).forEach(cat => { const o = document.createElement('option'); o.value = cat; o.textContent = cat; catSel.appendChild(o); });
 
-        // default to top-level selections
-        const topCat = document.getElementById('rollerCategorySelect')?.value;
-        const topType = document.getElementById('rollerTypeSelect')?.value;
-        const topCode = document.getElementById('rollerCodeSelect')?.value;
-        if(topCat && rollerData[topCat]) catSel.value = topCat;
+    const topCat = document.getElementById('rollerCategorySelect')?.value;
+    const topType = document.getElementById('rollerTypeSelect')?.value;
+    const topCode = document.getElementById('rollerCodeSelect')?.value;
+    if(topCat && rollerData[topCat]) catSel.value = topCat;
 
-        populateTypes();
-        if(topType && rollerData[catSel.value] && rollerData[catSel.value][topType]) {
-            typeSel.value = topType;
-            populateCodes();
-        }
-        if(topCode) {
-            const opt = Array.from(codeSel.options).find(o => o.value == topCode);
-            if(opt) codeSel.value = topCode;
-        }
+    populateTypes();
+    if(topType && rollerData[catSel.value] && rollerData[catSel.value][topType]) { typeSel.value = topType; populateCodes(); }
+    if(topCode) { const opt = Array.from(codeSel.options).find(o => o.value === topCode); if(opt) codeSel.value = topCode; }
 
-        catSel.addEventListener('change', populateTypes);
-        typeSel.addEventListener('change', populateCodes);
-    } catch(e){ console.error('setupRollerRowSelects error', e); }
+    catSel.addEventListener('change', populateTypes);
+    typeSel.addEventListener('change', populateCodes);
+  } catch(e){ console.error('[patch] setupRollerRowSelects', e); }
 };
-
 const addRollerRow = () => {
                 const container = document.getElementById('roller-rows-container');
                 let rowCounter = container.querySelectorAll('.calculation-row').length;
-                
+                if (rowCounter >= 10) { alert('สามารถเพิ่มได้สูงสุด 10 รายการ'); return; }
                 rowCounter++;
                 const rowId = `roller-row-${rowCounter}`;
                 const rowHtml = `
@@ -446,7 +418,30 @@ const addRollerRow = () => {
                         </div>
                     </div>`;
                 container.insertAdjacentHTML('beforeend', rowHtml);
-                container.querySelector(`button[data-row-id="${rowId}"]`).addEventListener('click', (e) => {
+                
+                // [PATCH] add per-row selectors to Roller rows (Category/Type/Code) with clear labels
+                try {
+                  const newRowEl = container.querySelector(`#${rowId}`);
+                  if(newRowEl && !newRowEl.querySelector('.roller-row-category')){
+                    const selectsBlock = document.createElement('div');
+                    selectsBlock.className = 'grid grid-cols-1 md:grid-cols-6 gap-2 mb-2';
+                    selectsBlock.innerHTML = `
+                      <label class="text-sm text-slate-600 md:col-span-2">ประเภท
+                        <select class="w-full p-2 border rounded-md roller-row-category"></select>
+                      </label>
+                      <label class="text-sm text-slate-600 md:col-span-2">รุ่น
+                        <select class="w-full p-2 border rounded-md roller-row-type"></select>
+                      </label>
+                      <label class="text-sm text-slate-600 md:col-span-2">รหัส
+                        <select class="w-full p-2 border rounded-md roller-row-code"></select>
+                      </label>`;
+                    const firstGrid = newRowEl.querySelector('.grid');
+                    if (firstGrid) newRowEl.insertBefore(selectsBlock, firstGrid);
+                    else newRowEl.appendChild(selectsBlock);
+                    setupRollerRowSelects(newRowEl);
+                  }
+                } catch(e){ console.warn('[patch] inject selectors failed', e); }
+container.querySelector(`button[data-row-id="${rowId}"]`).addEventListener('click', (e) => {
                     e.target.closest('.calculation-row').remove();
                     container.querySelectorAll('.calculation-row').forEach((row, index) => {
                         row.querySelector('.font-bold').textContent = `รายการที่ ${index + 1}`;
@@ -878,74 +873,86 @@ doc.text('(_______________________________)', 20 + signatureSpacing * 2 + signat
             };
 
             const handleRollerCalculation = () => {
-                const errorDiv = document.getElementById('rollerErrorMessage');
-                const rows = rowsContainer.querySelectorAll('.calculation-row');
-                if (rows.length === 0) {
-                    errorDiv.textContent = 'กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ';
-                    return;
-                }
+const rowsContainer = document.getElementById('rollerRows') || document.querySelector('#roller-rows, [id*="roller"][id*="Rows"], [id*="Rows"][id*="roller"]');
+  if(!rowsContainer){ console.error('[patch] roller rows container not found'); return; }
+  const rows = rowsContainer.querySelectorAll('.calculation-row');
+  if(rows.length === 0){ alert('กรุณาเพิ่มรายการอย่างน้อย 1 รายการ'); return; }
 
-                let totalCost = 0, itemsForPdf = [], allRowsValid = true;
+  let totalCost = 0;
+  const itemsForPdf = [];
+  let allRowsValid = true;
 
-                rows.forEach((row, index) => {
-                    const widthInput = row.querySelector('.roller-width');
-                    const heightInput = row.querySelector('.roller-height');
-                    const qtyInput = row.querySelector('.roller-qty');
-                    const adjustSelect = row.querySelector('.roller-adjust');
-                    
-                    [widthInput, heightInput, qtyInput].forEach(i => i.classList.remove('border-red-500'));
+  rows.forEach((row, index) => {
+    const wEl = row.querySelector('.roller-width') || row.querySelector('[name*="width"]');
+    const hEl = row.querySelector('.roller-height') || row.querySelector('[name*="height"]');
+    const qEl = row.querySelector('.roller-qty') || row.querySelector('[name*="qty"], [name*="quantity"]');
+    const adjSel = row.querySelector('.roller-adjust') || row.querySelector('select[name*="adjust"]');
+    const catSel = row.querySelector('.roller-row-category');
+    const typeSel = row.querySelector('.roller-row-type');
+    const codeSel = row.querySelector('.roller-row-code');
 
-                    const originalWidth = parseFloat(widthInput.value);
-                    const originalHeight = parseFloat(heightInput.value);
-                    const qty = parseInt(qtyInput.value, 10);
-                    const adjust = adjustSelect.value;
-                    
-                    if([originalWidth, originalHeight, qty].some(isNaN) || [originalWidth, originalHeight, qty].some(v => v <= 0)) {
-                        [widthInput, heightInput, qtyInput].forEach(i => {
-                            if (isNaN(parseFloat(i.value)) || parseFloat(i.value) <= 0) {
-                                i.classList.add('border-red-500');
-                            }
-                        });
-                        allRowsValid = false;
-                        return;
-                    }
+    const originalWidth = (wEl && wEl.value) ? wEl.value : '';
+    const originalHeight = (hEl && hEl.value) ? hEl.value : '';
+    const qty = qEl && qEl.value ? parseInt(qEl.value, 10) : 0;
+    const adjust = adjSel && adjSel.value ? adjSel.value : '';
 
-                    const rollerData = (appConfig && appConfig.prices && appConfig.prices.roller) ? appConfig.prices.roller : {};
-                    const catSel = row.querySelector('.roller-row-category');
-                    const typeSel = row.querySelector('.roller-row-type');
-                    const codeSel = row.querySelector('.roller-row-code');
-                    const rowCategory = catSel ? catSel.value : '';
-                    const rowType = typeSel ? typeSel.value : '';
-                    const rowCode = codeSel ? codeSel.value : '';
-                    if(!rollerData[rowCategory] || !rollerData[rowCategory][rowType]) {
-                        allRowsValid = false;
-                        return;
-                    }
-                    const rowPrice = rollerData[rowCategory][rowType].price || 0;
-                    const widthInMeters = normalizeToMeters(originalWidth);
-                    const heightInMeters = normalizeToMeters(originalHeight);
-                    const itemCost = widthInMeters * heightInMeters * 1.2 * rowPrice * qty;
-                    totalCost += itemCost;
-                    itemsForPdf.push({ no: index + 1, category: rowCategory, type: rowType, code: rowCode, width: originalWidth, height: originalHeight, qty: qty, adjust: adjust, itemCost: itemCost });
-                });
+    if(!originalWidth || !originalHeight || !qty){ allRowsValid = false; return; }
 
-                if (!allRowsValid) {
-                    errorDiv.textContent = 'กรุณากรอกข้อมูลในทุกช่องให้ถูกต้อง';
-                    return;
-                }
-                
-                const category = document.getElementById('rollerCategorySelect').value;
-                const type = document.getElementById('rollerTypeSelect').value;
-                const code = document.getElementById('rollerCodeSelect').value;
-                
-                document.getElementById('rollerTotalPrice').textContent = `฿${totalCost.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-                document.getElementById('rollerResult').classList.remove('hidden');
+    const rollerData = (window.appConfig && appConfig.prices && appConfig.prices.roller) ? appConfig.prices.roller : {};
+    const rowCategory = catSel ? catSel.value : '';
+    const rowType = typeSel ? typeSel.value : '';
+    const rowCode = codeSel ? codeSel.value : '';
+    if(!rollerData[rowCategory] || !rollerData[rowCategory][rowType]){ allRowsValid = false; return; }
 
-                rollerCalculatedData = { items: itemsForPdf, totalCost };
+    const rowPrice = Number(rollerData[rowCategory][rowType].price || 0);
+    const normalize = (typeof normalizeToMeters === 'function') ? normalizeToMeters : (v)=>{ const n = parseFloat(String(v).replace(/[^\d.]/g,'')); return isNaN(n)?0:n/100; };
+    const widthInMeters = normalize(originalWidth);
+    const heightInMeters = normalize(originalHeight);
+    const itemCost = widthInMeters * heightInMeters * 1.2 * rowPrice * qty;
 
-                document.getElementById('rollerPdfBtn').disabled = false;
-                document.getElementById('rollerSaveBtn').disabled = false;
-            };
+    totalCost += itemCost;
+    itemsForPdf.push({
+      no: index+1, category: rowCategory, type: rowType, code: rowCode,
+      width: originalWidth, height: originalHeight, qty, adjust,
+      itemCost
+    });
+  });
+
+  if(!allRowsValid){ alert('กรอกข้อมูลไม่ครบหรือเลือกรายการไม่ถูกต้องในบางแถว'); return; }
+  window.rollerCalculatedData = { items: itemsForPdf, totalCost };
+
+  // Update summary on screen if elements exist
+  (function(){
+    const resultEl = document.getElementById('rollerResult');
+    const totalEl = document.getElementById('rollerTotalPrice');
+    if(resultEl){
+      const rows = itemsForPdf.map(i => `<tr>
+        <td class="px-2 py-1">${i.no}</td>
+        <td class="px-2 py-1">${i.category}</td>
+        <td class="px-2 py-1">${i.type}</td>
+        <td class="px-2 py-1">${i.code||'-'}</td>
+        <td class="px-2 py-1">${i.width} x ${i.height}</td>
+        <td class="px-2 py-1">${i.adjust||'-'}</td>
+        <td class="px-2 py-1">${i.qty}</td>
+        <td class="px-2 py-1 text-right">${i.itemCost.toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+      </tr>`).join('');
+      resultEl.innerHTML = `<div class="overflow-x-auto"><table class="min-w-full text-sm">
+        <thead><tr>
+          <th class="px-2 py-1 text-left">ลำดับ</th>
+          <th class="px-2 py-1 text-left">ประเภท</th>
+          <th class="px-2 py-1 text-left">รุ่น</th>
+          <th class="px-2 py-1 text-left">รหัส</th>
+          <th class="px-2 py-1 text-left">ขนาด (ซม.)</th>
+          <th class="px-2 py-1 text-left">การปรับ</th>
+          <th class="px-2 py-1 text-left">จำนวน</th>
+          <th class="px-2 py-1 text-right">ราคารวม (บาท)</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>`;
+    }
+    if(totalEl) totalEl.textContent = window.rollerCalculatedData.totalCost.toLocaleString('en-US', {minimumFractionDigits:2});
+  })();
+};;
             
             const populateRollerDropdowns = () => {
                 const rollerData = appConfig.prices?.roller;
@@ -1569,17 +1576,20 @@ doc.text('(_______________________________)', 20 + signatureSpacing * 2 + signat
             document.getElementById('rollerCalculateBtn').addEventListener('click', handleRollerCalculation);
             
 document.getElementById('rollerPdfBtn').addEventListener('click', () => {
-                const data = rollerCalculatedData; if(!data) return;
-                const columns = ["ลำดับ", "ประเภท", "รุ่น", "รหัส", "ขนาด (ซม.)", "การปรับ", "จำนวน", "ราคารวม (บาท)"];
-                const rows = data.items.map(item => [
-                    item.no, item.category || '-', item.type || '-', item.code || '-',
-                    `${item.width} x ${item.height}`, item.adjust, item.qty,
-                    item.itemCost.toLocaleString('en-US', {minimumFractionDigits: 2})
-                ]);
-                const extraInfo = [];
-                showPdfPreview('ใบเสนอราคา - ม่านม้วน', columns, rows, data.totalCost, 'ใบเสนอราคา-ม่านม้วน.pdf', extraInfo);
+  const data = window.rollerCalculatedData; if(!data) return;
+  const columns = ["ลำดับ", "ประเภท", "รุ่น", "รหัส", "ขนาด (ซม.)", "การปรับ", "จำนวน", "ราคารวม (บาท)"];
+  const rows = data.items.map(item => [
+    item.no, item.category||'-', item.type||'-', item.code||'-',
+    `${item.width} x ${item.height}`, item.adjust, item.qty,
+    item.itemCost.toLocaleString('en-US',{minimumFractionDigits:2})
+  ]);
+  const extraInfo = [];
+  showPdfPreview('ใบเสนอราคา - ม่านม้วน', columns, rows, data.totalCost, 'ใบเสนอราคา-ม่านม้วน.pdf', extraInfo);
+});
+);
+            document.getElementById('rollerSaveBtn').addEventListener('click', () => { 
+                if(rollerCalculatedData) saveQuotation('roller', rollerCalculatedData, `ม่านม้วน - ${rollerCalculatedData.type} (${rollerCalculatedData.code})`); 
             });
-document.getElementById('rollerSaveBtn').addEventListener('click', () => { if(rollerCalculatedData) saveQuotation('roller', rollerCalculatedData, `ม่านม้วน - หลายรายการ`); });
 
 
             pdfDownloadBtn.addEventListener('click', () => {
