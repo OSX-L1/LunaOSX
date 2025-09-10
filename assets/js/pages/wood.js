@@ -1,0 +1,1 @@
+window.Pages = window.Pages || {}; window.Pages.wood = { init(root){} };
