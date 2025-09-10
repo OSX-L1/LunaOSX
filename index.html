@@ -1578,5 +1578,51 @@ doc.text('(_______________________________)', 20 + signatureSpacing * 2 + signat
             addRollerRow();
         });
     </script>
+
+<!-- ===== Runtime Safety Shim (non-invasive) ===== -->
+<script>
+(function(){
+  // Global error overlay so the app won't look blank without a hint
+  var overlay;
+  window.addEventListener('error', function(ev){
+    try{
+      if(overlay) return;
+      overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;left:0;right:0;bottom:0;background:#fee2e2;color:#7f1d1d;padding:10px 14px;font:12px/1.4 system-ui, -apple-system, Segoe UI, Roboto;z-index:2147483647;box-shadow:0 -2px 8px rgba(0,0,0,.1)';
+      overlay.textContent = 'เกิดข้อผิดพลาดของสคริปต์: ' + (ev.message || ev.error || 'Unknown error');
+      var btn = document.createElement('button');
+      btn.textContent = 'ดูรายละเอียดใน Console';
+      btn.style.cssText = 'margin-left:12px;padding:4px 8px;border:1px solid #ef4444;background:#fff;border-radius:6px;cursor:pointer';
+      btn.onclick = function(){ alert('กด F12 → Console เพื่อดูรายละเอียดข้อผิดพลาด'); };
+      overlay.appendChild(btn);
+      document.body.appendChild(overlay);
+      console.error('GLOBAL ERROR:', ev.error || ev.message, ev);
+    }catch(_e){}
+  }, true);
+
+  document.addEventListener('DOMContentLoaded', function(){
+    try{
+      // ถ้ามีฟังก์ชัน populate ของแต่ละหมวดให้เรียกอย่างปลอดภัย
+      if (typeof populateRollerDropdowns === 'function') try{ populateRollerDropdowns(); }catch(e){ console.warn('populateRollerDropdowns error', e); }
+      if (typeof populatePvcDropdowns === 'function')    try{ populatePvcDropdowns(); }catch(e){ console.warn('populatePvcDropdowns error', e); }
+      if (typeof populateWoodDropdowns === 'function')   try{ populateWoodDropdowns(); }catch(e){ console.warn('populateWoodDropdowns error', e); }
+      if (typeof populateRailDropdowns === 'function')   try{ populateRailDropdowns(); }catch(e){ console.warn('populateRailDropdowns error', e); }
+      if (typeof populateBlindsDropdowns === 'function') try{ populateBlindsDropdowns(); }catch(e){ console.warn('populateBlindsDropdowns error', e); }
+
+      // ถ้ายังไม่มีอะไรแสดง ให้พยายามเลือกแท็บแรกอัตโนมัติ
+      try{
+        var panels = document.querySelectorAll('[data-panel], .panel, .calculator-section');
+        var anyVisible = false;
+        panels.forEach(function(p){ var s = getComputedStyle(p); if (s.display !== 'none' && s.visibility !== 'hidden' && p.offsetHeight>0) anyVisible = true; });
+        if(!anyVisible){
+          var firstNav = document.querySelector('[data-page], [data-target], .nav-btn, .menu-item, .tab-link');
+          if(firstNav && typeof firstNav.click === 'function'){ firstNav.click(); }
+        }
+      }catch(e){ console.warn('fallback show first tab failed', e); }
+    }catch(e){ console.warn('shim init failed', e); }
+  });
+})();
+</script>
+
 </body>
 </html>
