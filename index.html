@@ -464,7 +464,7 @@
                 newRow.querySelector('.rail-type-select').addEventListener('change', handleRailTypeChange);
             };
 
-            const normalizeToMeters = (value) => (value >= 10) ? value / 100 : value;
+            const normalizeToMeters = (value) => (value >= 100) ? value / 100 : value;
             const calculatePvcHeight = (h) => {
                 if (h <= 2.01) return 2.0; if (h <= 2.20 || h === 2.21) return 2.2;
                 if (h <= 2.40 || h === 2.41) return 2.4; if (h <= 2.60 || h === 2.61) return 2.6;
