@@ -3,13 +3,14 @@
   <h2 style="margin-top:0">คำนวณมู่ลี่อลูมิเนียม (ดึงราคาจาก Google Sheets)</h2>
 
   <div id="aluRows" class="grid grid-12" style="gap:8px"></div>
-  <div class="mt-8"><button id="aluAddRow" class="btn">+ เพิ่มรายการ</button></div>
+  <div class="col-12" style="margin-top:8px"><button id="aluAddRow" class="btn">+ เพิ่มรายการ</button></div>
 
-  <div class="mt-12"><button id="aluCalc" class="btn btn-tertiary">คำนวณราคา</button>
+  <div class="col-12" style="margin-top:12px">
+    <button id="aluCalc" class="btn btn-tertiary">คำนวณราคา</button>
     <span id="aluTotal" class="total" style="margin-left:10px">รวม (ธรรมดา): ฿0.00 | รวม (โซ่วน): ฿0.00</span>
   </div>
 
-  <div class="mt-12">
+  <div class="col-12" style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap">
     <button id="aluAddToQuote" class="btn btn-secondary">เพิ่มลงใบเสนอราคารวม</button>
     <button id="aluCreatePdf" class="btn">สร้าง PDF</button>
   </div>
