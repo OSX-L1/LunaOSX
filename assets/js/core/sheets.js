@@ -15,7 +15,6 @@
     });
   }
   function buildCodePriceMap(rows){
-    // พยายามเดาชื่อหัวคอลัมน์ที่เป็นโค้ด/ราคา
     const get = (o, keys) => {
       const ks = Object.keys(o);
       for(const k of ks){
