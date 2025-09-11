@@ -36,7 +36,6 @@ window.Pages.alu = (function(){
       wrap.className = 'grid grid-12';
       wrap.innerHTML = rowHTML();
       rowsEl.appendChild(wrap);
-
       const codeSel = wrap.querySelector('.row-code');
       fillCodes(codeSel);
       wrap.querySelector('.del-row').addEventListener('click', ()=>wrap.remove());
@@ -107,6 +106,10 @@ window.Pages.alu = (function(){
       }
       buildRow();
     }
+
+    document.addEventListener('click', (e)=>{
+      if(e.target && e.target.id==='aluCalc'){ e.preventDefault(); compute(); }
+    });
 
     addRowBtn.addEventListener('click', buildRow);
     calcBtn.addEventListener('click', compute);
