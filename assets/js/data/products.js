@@ -1,6 +1,5 @@
 // assets/js/data/products.js
-// ตั้งค่า Google Sheets สำหรับ "มู่ลี่อลูมิเนียม"
-// sheet1 = ราคาธรรมดา, sheet2 = ราคาโซ่วน (ตามที่ผู้ใช้ให้)
+// ตั้งค่า Google Sheets สำหรับ "มู่ลี่อลูมิเนียม": sheet1 (ธรรมดา), sheet2 (โซ่วน)
 window.appConfig = window.appConfig || {};
 window.appConfig.sheets = window.appConfig.sheets || {};
 window.appConfig.sheets.alu = {
